@@ -154,6 +154,25 @@ main.container { padding-top: 32px; padding-bottom: 64px; }
 
 .chart-wrap { position: relative; height: 420px; }
 
+/* Chart period selector */
+.chart-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.chart-head h2 { margin: 0; }
+.chart-periods { display: flex; gap: 6px; }
+.period-btn {
+  background: var(--bg-elev);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.period-btn:hover { border-color: var(--accent); color: var(--accent-hover); }
+.period-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
 /* Pricing */
 .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
 .pricing-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 28px; }

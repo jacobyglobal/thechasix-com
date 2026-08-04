@@ -114,8 +114,13 @@ def load_leaderboard_enriched() -> pd.DataFrame:
 
 
 def load_breadth() -> pd.DataFrame:
-    """Load aggregate market breadth stats per duration."""
-    return pd.read_csv(BREADTH_CSV)
+    """Load aggregate market breadth stats per duration, in 4w/12w/26w/52w order."""
+    df = pd.read_csv(BREADTH_CSV)
+    df["duration"] = df["duration"].astype(str)
+    order = {d: i for i, d in enumerate(DURATIONS)}
+    df["_order"] = df["duration"].map(order)
+    df = df.sort_values("_order").drop(columns="_order").reset_index(drop=True)
+    return df
 
 
 def get_ticker_profile(ticker: str) -> dict:

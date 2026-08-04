@@ -18,7 +18,6 @@
           <th>Period High</th>
           <th>% Off High</th>
           <th>% Off Low</th>
-          <th>At High</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -31,7 +30,10 @@
 </section>
 
 <section class="card">
-  <h2>Price History (10-Year Daily)</h2>
+  <div class="chart-head">
+    <h2>Price History (10-Year Daily)</h2>
+    <div class="chart-periods" id="chart-periods"></div>
+  </div>
   <div class="chart-wrap"><canvas id="price-chart"></canvas></div>
 </section>
 {% endblock %}

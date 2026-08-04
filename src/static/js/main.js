@@ -19,10 +19,19 @@
     return String(v).slice(0, 10);
   }
 
-  /* Heatmap: decile 1 (farthest from high) = dark, decile 10 (closest) = accent red. */
+  function fmtAxisDate(v) {
+    /* Normalize an ISO datetime (2026-07-30T00:00:00) to MM-DD-YYYY. */
+    if (!v) return "";
+    var s = String(v);
+    var m = s.match(/(\d{4})-(\d{2})-(\d{2})/);
+    if (!m) return s;
+    return m[2] + "-" + m[3] + "-" + m[1];
+  }
+
+  /* Heatmap: decile 10 (closest to high) = black, decile 1 (farthest) = accent red. */
   function heatColor(d) {
     if (d === null || d === undefined || isNaN(d)) return "transparent";
-    var t = Math.max(0, Math.min(1, (d - 1) / 9));
+    var t = Math.max(0, Math.min(1, (10 - d) / 9));
     var r = Math.round(25 + (225 - 25) * t);
     var g = Math.round(25 + (29 - 25) * t);
     var b = Math.round(29 + (46 - 29) * t);
@@ -48,7 +57,7 @@
     fetch(API_ROOT + "/api/metrics/breadth")
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(function (data) {
-        label.textContent = "Percent of tracked ETFs at market high by horizon.";
+        label.textContent = "Average distance from period highs by horizon.";
         grid.innerHTML = "";
         data.items.forEach(function (row) {
           var tile = document.createElement("div");
@@ -56,8 +65,7 @@
           tile.innerHTML =
             "<div class='dur'>" + row.duration + "</div>" +
             "<div class='num'>" + fmtPct(row.avg_off_high_pct) + "</div>" +
-            "<div class='sub'>avg off high</div>" +
-            "<div class='sub'>at high: " + row.pct_at_high + "%</div>";
+            "<div class='sub'>avg off high</div>";
           grid.appendChild(tile);
         });
       })
@@ -170,9 +178,60 @@
   }
 
   /* ---- Stock detail ---- */
+  var priceChart = null;
+  var chartTicker = null;
+
+  var CHART_PERIODS = [
+    { label: "10Y", days: 2520 },
+    { label: "5Y", days: 1260 },
+    { label: "2Y", days: 504 },
+    { label: "1Y", days: 252 },
+    { label: "6M", days: 126 },
+    { label: "1M", days: 21 },
+  ];
+
+  function loadPriceChart(ticker, limit) {
+    var canvas = document.getElementById("price-chart");
+    if (!canvas) return;
+    var apiRoot = API_ROOT;
+    fetch(apiRoot + "/api/stocks/" + encodeURIComponent(ticker) + "/chart?limit=" + limit)
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (data) {
+        var items = data.items || [];
+        var labels = items.map(function (x) { return fmtAxisDate(x.date || x.datetime || ""); });
+        var close = items.map(function (x) { return x.close !== undefined ? x.close : x.Close; });
+        drawPriceChart(labels, close, ticker);
+      })
+      .catch(function (err) {
+        var chart = document.getElementById("price-chart");
+        if (chart) {
+          chart.getContext("2d").clearRect(0, 0, chart.width, chart.height);
+        }
+      });
+  }
+
+  function setupChartPeriods(ticker) {
+    var bar = document.getElementById("chart-periods");
+    if (!bar) return;
+    bar.innerHTML = "";
+    CHART_PERIODS.forEach(function (period) {
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "period-btn" + (period.days === 2520 ? " active" : "");
+      btn.textContent = period.label;
+      btn.addEventListener("click", function () {
+        bar.querySelectorAll(".period-btn").forEach(function (b) { b.classList.remove("active"); });
+        btn.classList.add("active");
+        loadPriceChart(ticker, period.days);
+      });
+      bar.appendChild(btn);
+    });
+  }
+
   function loadDetail(ticker) {
     var errBox = document.getElementById("detail-error");
     var apiRoot = API_ROOT;
+    chartTicker = ticker;
 
     fetch(apiRoot + "/api/stocks/" + encodeURIComponent(ticker))
       .then(function (r) {
@@ -196,8 +255,7 @@
             "<td>" + row.days + "</td>" +
             "<td>" + fmtNum(row.period_high_value) + "</td>" +
             "<td style='background:" + bg + ";'>" + fmtPct(row.off_high_pct) + "</td>" +
-            "<td>" + fmtPct(row.off_low_pct) + "</td>" +
-            "<td>" + (row.at_high ? "<strong style='color:var(--accent)'>Yes</strong>" : "No") + "</td>";
+            "<td>" + fmtPct(row.off_low_pct) + "</td>";
           tbody.appendChild(tr);
         });
       })
@@ -206,20 +264,8 @@
         errBox.textContent = "Could not load profile for " + ticker + ": " + err.message;
       });
 
-    fetch(apiRoot + "/api/stocks/" + encodeURIComponent(ticker) + "/chart?limit=760")
-      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
-      .then(function (data) {
-        var items = data.items || [];
-        var labels = items.map(function (x) { return String(x.date || x.datetime || ""); });
-        var close = items.map(function (x) { return x.close !== undefined ? x.close : x.Close; });
-        drawPriceChart(labels, close, ticker);
-      })
-      .catch(function (err) {
-        var chart = document.getElementById("price-chart");
-        if (chart) {
-          chart.getContext("2d").clearRect(0, 0, chart.width, chart.height);
-        }
-      });
+    setupChartPeriods(ticker);
+    loadPriceChart(ticker, 2520);
 
     fetch(apiRoot + "/api/stocks/" + encodeURIComponent(ticker) + "/similar")
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
@@ -231,7 +277,7 @@
           var t = item.ticker || item.symbol || "";
           li.innerHTML =
             "<a href='/stock.html?ticker=" + t + "'>" + t + "</a>" +
-            "<span class='meta'> — " + fmtNum(item.similarity_score) + " similarity</span>";
+            "<span class='meta'> — relationship " + item.rank + "/10</span>";
           list.appendChild(li);
         });
       })
@@ -244,11 +290,12 @@
   function drawPriceChart(labels, close, ticker) {
     var canvas = document.getElementById("price-chart");
     if (!canvas || !window.Chart) return;
+    if (priceChart) priceChart.destroy();
     var ctx = canvas.getContext("2d");
     var gradient = ctx.createLinearGradient(0, 0, 0, canvas.parentElement.clientHeight);
     gradient.addColorStop(0, "rgba(225,29,46,0.35)");
     gradient.addColorStop(1, "rgba(225,29,46,0)");
-    new Chart(ctx, {
+    priceChart = new Chart(ctx, {
       type: "line",
       data: {
         labels: labels,
@@ -267,7 +314,16 @@
         responsive: true,
         maintainAspectRatio: false,
         interaction: { mode: "index", intersect: false },
-        plugins: { legend: { labels: { color: "#9a9aa5" } } },
+        plugins: {
+          legend: { labels: { color: "#9a9aa5" } },
+          tooltip: {
+            callbacks: {
+              title: function (items) {
+                return fmtAxisDate(items[0].label);
+              }
+            }
+          }
+        },
         scales: {
           x: { ticks: { color: "#9a9aa5", maxTicksLimit: 10 }, grid: { color: "#1f1f24" } },
           y: { ticks: { color: "#9a9aa5" }, grid: { color: "#1f1f24" } }

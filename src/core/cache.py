@@ -23,10 +23,14 @@ def _async_url(url: str) -> str:
     """Convert a sync DB URL to its async driver equivalent.
 
     Local dev uses sqlite (needs aiosqlite); production uses PostgreSQL
-    (asyncpg is already async).
+    (needs asyncpg, not the default sync psycopg2 driver).
     """
     if url.startswith("sqlite"):
         return url.replace("sqlite://", "sqlite+aiosqlite://", 1)
+    if url.startswith("postgresql://"):
+        return url.replace("postgresql://", "postgresql+asyncpg://", 1)
+    if url.startswith("postgres://"):
+        return url.replace("postgres://", "postgresql+asyncpg://", 1)
     return url
 
 

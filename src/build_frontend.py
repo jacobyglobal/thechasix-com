@@ -4,6 +4,7 @@ Renders the Jinja2 templates (src/templates/) to static HTML in `dist/`
 for deployment on Netlify, and copies static assets (css/js).
 """
 
+import os
 import sys
 from pathlib import Path
 
@@ -13,7 +14,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from src.config import DIST_DIR, STATIC_DIR, TEMPLATE_DIR
 
-API_ROOT = "https://thechasix-com.onrender.com"
+API_ROOT = os.getenv("API_ROOT", "https://api.thechasix.com")
 
 TEMPLATE_TARGETS = [
     ("index.html", "index.html"),

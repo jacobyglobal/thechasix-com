@@ -18,7 +18,7 @@ API_ROOT = "https://thechasix-com.onrender.com"
 TEMPLATE_TARGETS = [
     ("index.html", "index.html"),
     ("screener.html", "screener.html"),
-    ("stock_detail.html", "stock_detail.html"),
+    ("stock_detail.html", "stock.html"),
     ("pricing.html", "pricing.html"),
 ]
 

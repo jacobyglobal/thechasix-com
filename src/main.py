@@ -49,6 +49,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[FRONTEND_URL, API_URL] if not DEBUG else ["*"],
+    allow_origin_regex=r"https://.*\.netlify\.app" if not DEBUG else None,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

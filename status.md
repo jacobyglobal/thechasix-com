@@ -34,10 +34,12 @@ All platforms use the name **`thechasix-com`** for 100% consistency.
 ## In Progress
 
 ### 4. Netlify Site
-- [ ] Account created via GitHub
-- [ ] Import repo `thechasix-com`
-- [ ] Build command: `python -m src.build_frontend`
-- [ ] Publish directory: `dist/`
+- [x] Account created via GitHub
+- [x] Import repo `thechasix-com`
+- [x] Build command: `python -m src.build_frontend`
+- [x] Publish directory: `dist/`
+- [x] First production deploy succeeded (2026-08-03, commit `0261294`)
+- [x] Site URL: https://boisterous-rabanadas-45ce33.netlify.app
 - [ ] Environment variables: `STRIPE_PUBLISHABLE_KEY`, `API_ROOT`
 
 ### 5. Stripe

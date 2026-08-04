@@ -1,0 +1,48 @@
+# Sensitive configuration
+.env
+.env.local
+
+# Python generated files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Distribution and build artifacts
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# Testing/Coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Distribution builds
+dist/
+node_modules/
+
+# Runtime data
+data/cache/
+data/logs/
+*.db
+*.sqlite
+*.db-journal

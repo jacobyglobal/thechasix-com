@@ -1,0 +1,62 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "watcher": {
+    "ignore": [
+      "data/**",
+      "output/**",
+      "node_modules/**",
+      "dist/**",
+      ".venv/**",
+      "**/__pycache__/**"
+    ]
+  },
+  "agent": {
+    "programmer": {
+      "mode": "subagent",
+      "model": "google/gemini-2.5-flash-lite",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow"
+      }
+    },
+    "qc": {
+      "mode": "subagent",
+      "model": "google/gemini-2.5-flash-lite",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow"
+      }
+    },
+    "tpm": {
+      "mode": "subagent",
+      "model": "google/gemini-3.6-flash",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow"
+      }
+    },
+    "researcher": {
+      "mode": "subagent",
+      "model": "google/gemini-2.5-flash-lite",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow"
+      }
+    }
+  },
+  "free_tier_model_strategy": {
+    "primary_lightweight": "google/gemini-2.5-flash-lite (Fastest, low context overhead for repetitive edits)",
+    "primary_standard": "google/gemini-3.6-flash (Default for architecture, planning, complex refactoring)",
+    "fallbacks": [
+      "opencode/big-pickle",
+      "opencode/nemotron-3-ultra-free"
+    ],
+    "task_assignments": {
+      "frontend_templates_css": "google/gemini-2.5-flash-lite",
+      "python_backend_fastapi": "google/gemini-2.5-flash-lite",
+      "sql_data_imports": "google/gemini-2.5-flash-lite",
+      "planning_and_tpm": "google/gemini-3.6-flash",
+      "laguna_subagent": "Use strictly for complex multi-file feature builds to preserve quota"
+    }
+  }
+}

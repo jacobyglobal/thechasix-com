@@ -1,0 +1,21 @@
+[build]
+  publish = "dist"
+  command = "python -m src.build_frontend"
+
+[[redirects]]
+  from = "/api/*"
+  to = "https://api.thechasix.com/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/webhook/stripe"
+  to = "https://api.thechasix.com/webhook/stripe"
+  status = 200
+  force = true
+
+[build.environment]
+  PYTHON_VERSION = "3.12"
+  NODE_VERSION = "20"
+  API_ROOT = "https://api.thechasix.com"
+  STRIPE_PUBLISHABLE_KEY = "pk_test_placeholder"

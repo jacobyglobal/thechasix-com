@@ -1,0 +1,46 @@
+name: Nightly Data Refresh
+
+on:
+  schedule:
+    - cron: '0 7 * * 1-5'  # 2 AM EST (7 AM UTC), weekdays only
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Refresh stock data from Schwab API
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SCHWAB_CLIENT_ID: ${{ secrets.SCHWAB_CLIENT_ID }}
+          SCHWAB_CLIENT_SECRET: ${{ secrets.SCHWAB_CLIENT_SECRET }}
+          SCHWAB_REFRESH_TOKEN: ${{ secrets.SCHWAB_REFRESH_TOKEN }}
+        run: |
+          python -m src.scripts.refresh_data --universe sp500
+
+      - name: Build frontend pages (update static HTML)
+        env:
+          API_ROOT: https://api.thechasix.com
+        run: |
+          python -m src.build_frontend
+
+      - name: Push updated static files to Netlify
+        uses: netlify/actions/cli@master
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+        with:
+          args: deploy --prod --dir=dist
+
+      - name: Notify completion
+        run: |
+          echo "Data refresh complete. Updated $(date)"

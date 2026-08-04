@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Pricing — The ChasIX{% endblock %}
+{% block content %}
+<section class="page-head">
+  <h1>Pricing</h1>
+  <p class="muted">Free market intelligence now. Standalone research reports coming next.</p>
+</section>
+
+<div class="pricing-grid">
+  <div class="pricing-card">
+    <h2>Free</h2>
+    <p class="price">$0</p>
+    <ul>
+      <li>ETF &amp; sector screener</li>
+      <li>Market breadth aggregates</li>
+      <li>10-year price history charts</li>
+      <li>Similar-asset comparisons</li>
+    </ul>
+    <a class="btn btn-primary" href="/screener.html">Get Started</a>
+  </div>
+  <div class="pricing-card featured">
+    <h2>Pro <span class="badge">Coming Soon</span></h2>
+    <p class="price">$9.99<span class="muted">/mo</span></p>
+    <ul>
+      <li>Unlimited screener results</li>
+      <li>Digital market intelligence reports</li>
+      <li>Advanced composite analytics</li>
+      <li>Subscriptions &amp; account sync</li>
+    </ul>
+    <a class="btn btn-outline" href="#">Notify Me</a>
+  </div>
+</div>
+{% endblock %}

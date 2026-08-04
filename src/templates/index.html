@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}The ChasIX — Financial Intelligence{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>Market high/low intelligence across the ETF landscape</h1>
+  <p class="hero-sub">
+    Ten years of daily ETF history distilled into 4-week, 12-week, 26-week and
+    52-week market high/low deciles, sector breadth, and similar-asset comparisons.
+  </p>
+  <div class="hero-actions">
+    <a class="btn btn-primary" href="/screener.html">Open Screener</a>
+    <a class="btn btn-outline" href="/stock.html?ticker=SPY">Explore an ETF</a>
+  </div>
+</section>
+
+<section class="breadth-card" data-breadth>
+  <h2>Market Breadth</h2>
+  <p class="muted">Loading breadth aggregates…</p>
+  <div class="breadth-grid"></div>
+</section>
+
+<section class="leaderboard-card">
+  <h2>Top Market Profiles</h2>
+  <p class="muted">Loading leaderboard…</p>
+  <table class="table" data-leaderboard>
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>Ticker</th>
+        <th>Sector</th>
+        <th>4w</th>
+        <th>12w</th>
+        <th>26w</th>
+        <th>52w</th>
+        <th>Score</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</section>
+{% endblock %}

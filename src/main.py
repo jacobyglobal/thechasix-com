@@ -63,6 +63,12 @@ app.include_router(auth_router, prefix="/api/auth", tags=["auth"])
 app.include_router(payments_router, prefix="/api/payments", tags=["payments"])
 
 
+@app.get("/")
+async def root():
+    """Root endpoint so / does not 404."""
+    return {"message": "The ChasIX API", "docs": "/docs", "version": "0.1.0"}
+
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint for Render."""

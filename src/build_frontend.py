@@ -1,7 +1,7 @@
 """Frontend build script for The ChasIX platform.
 
-Compiles Jinja2 templates into static HTML in `dist/` for deployment on Netlify.
-Wave 1 placeholder: emits a minimal landing page until templates are implemented.
+Renders the Jinja2 templates (src/templates/) to static HTML in `dist/`
+for deployment on Netlify, and copies static assets (css/js).
 """
 
 import sys
@@ -9,51 +9,42 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from src.config import DIST_DIR, STATIC_DIR, CONTENT_DIR
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-PLACEHOLDER_TEMPLATE = """<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The ChasIX — Financial Intelligence Platform</title>
-  <meta name="description" content="Finviz/Fangraphs-style market data, ETF history, and market breadth deciles." />
-  <link rel="stylesheet" href="/css/style.css" />
-</head>
-<body>
-  <header>
-    <nav>
-      <a class="brand" href="/">The ChasIX</a>
-      <a href="/screener.html">Screener</a>
-      <a href="/content/index.html">Reports</a>
-    </nav>
-  </header>
-  <main>
-    <h1>The ChasIX</h1>
-    <p>Financial Intelligence Platform — under construction.</p>
-  </main>
-  <footer>
-    <p>&copy; 2026 The ChasIX</p>
-  </footer>
-</body>
-</html>
-"""
+from src.config import DIST_DIR, STATIC_DIR, TEMPLATE_DIR
+
+API_ROOT = "https://thechasix-com.onrender.com"
+
+TEMPLATE_TARGETS = [
+    ("index.html", "index.html"),
+    ("screener.html", "screener.html"),
+    ("stock_detail.html", "stock_detail.html"),
+    ("pricing.html", "pricing.html"),
+]
 
 
 def build() -> None:
     """Render all templates to static HTML files in dist/."""
-    for directory in [DIST_DIR, STATIC_DIR / "css", STATIC_DIR / "js", DIST_DIR / "content"]:
+    for directory in [DIST_DIR, STATIC_DIR / "css", STATIC_DIR / "js", DIST_DIR / "css", DIST_DIR / "js", DIST_DIR / "content"]:
         directory.mkdir(parents=True, exist_ok=True)
 
-    (DIST_DIR / "index.html").write_text(PLACEHOLDER_TEMPLATE, encoding="utf-8")
+    env = Environment(
+        loader=FileSystemLoader(str(TEMPLATE_DIR)),
+        autoescape=select_autoescape(["html", "xml"]),
+    )
+    env.globals["api_root"] = API_ROOT
 
-    css = STATIC_DIR / "css" / "style.css"
-    if css.exists():
-        (DIST_DIR / "css" / "style.css").write_text(css.read_text(encoding="utf-8"), encoding="utf-8")
+    for template_name, output_name in TEMPLATE_TARGETS:
+        template = env.get_template(template_name)
+        html = template.render()
+        (DIST_DIR / output_name).write_text(html, encoding="utf-8")
+        print(f"Rendered {template_name} -> dist/{output_name}")
 
-    js = STATIC_DIR / "js" / "main.js"
-    if js.exists():
-        (DIST_DIR / "js" / "main.js").write_text(js.read_text(encoding="utf-8"), encoding="utf-8")
+    for asset_dir in ["css", "js"]:
+        src_dir = STATIC_DIR / asset_dir
+        for file in sorted(src_dir.glob("*.*")):
+            (DIST_DIR / asset_dir / file.name).write_text(file.read_text(encoding="utf-8"), encoding="utf-8")
+            print(f"Copied {file.name} -> dist/{asset_dir}/")
 
     print(f"Build complete: {DIST_DIR}")
 

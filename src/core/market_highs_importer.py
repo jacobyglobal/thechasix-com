@@ -140,6 +140,9 @@ def load_price_history(ticker: str, limit: int = 2520) -> dict:
         date_col = df.columns[0]
     else:
         date_col = df.columns[0]
+    # The close column is named after the ticker (yfinance-style); normalize it.
+    if "close" not in df.columns and ticker.lower() in df.columns:
+        df = df.rename(columns={ticker.lower(): "close"})
     df = df.sort_values(date_col).tail(limit)
     records = df.to_dict(orient="records")
     return {

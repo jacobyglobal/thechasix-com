@@ -33,15 +33,6 @@ async def list_available_metrics() -> dict:
     return {"metrics": AVAILABLE_METRICS}
 
 
-@router.get("/{ticker}")
-async def get_metrics(ticker: str) -> dict:
-    """Get computed metrics for a single ticker (multi-duration profile)."""
-    profile = get_ticker_profile(ticker)
-    if not profile:
-        raise HTTPException(status_code=404, detail=f"Ticker {ticker.upper()} not found")
-    return {"ticker": ticker.upper(), "metrics": AVAILABLE_METRICS, "profile": profile}
-
-
 @router.get("/breadth")
 async def market_breadth() -> dict:
     """Return aggregate market breadth stats per duration horizon."""
@@ -73,3 +64,12 @@ async def market_extremes(limit: int = 10) -> dict:
     )
 
     return {"strongest": strongest, "weakest": weakest}
+
+
+@router.get("/{ticker}")
+async def get_metrics(ticker: str) -> dict:
+    """Get computed metrics for a single ticker (multi-duration profile)."""
+    profile = get_ticker_profile(ticker)
+    if not profile:
+        raise HTTPException(status_code=404, detail=f"Ticker {ticker.upper()} not found")
+    return {"ticker": ticker.upper(), "metrics": AVAILABLE_METRICS, "profile": profile}

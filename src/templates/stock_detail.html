@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{{ ticker|default("ETF Detail") }} — The ChasIX{% endblock %}
+{% block content %}
+<section class="page-head">
+  <h1><span id="detail-ticker">{{ ticker|default("SPY") }}</span> <small class="muted" id="detail-sector"></small></h1>
+</section>
+
+<div id="detail-error" class="alert" hidden></div>
+
+<section class="detail-grid">
+  <div class="card" data-profile>
+    <h2>Market High / Low Profile</h2>
+    <table class="table" id="profile-table">
+      <thead>
+        <tr>
+          <th>Duration</th>
+          <th>Days</th>
+          <th>Close</th>
+          <th>Off High %</th>
+          <th>Off Low %</th>
+          <th>Decile</th>
+          <th>At High</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <div class="card">
+    <h2>Similar ETFs / Market Profiles</h2>
+    <ul class="similar-list" id="similar-list"></ul>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Price History (10-Year Daily)</h2>
+  <div class="chart-wrap"><canvas id="price-chart"></canvas></div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var params = new URLSearchParams(window.location.search);
+    var ticker = params.get("ticker") || "SPY";
+    loadDetail(ticker);
+  });
+</script>
+{% endblock %}

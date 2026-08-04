@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}ETF Screener — The ChasIX{% endblock %}
+{% block content %}
+<section class="page-head">
+  <h1>ETF &amp; Sector Screener</h1>
+  <p class="muted">Market high/low deciles across 4w / 12w / 26w / 52w horizons.</p>
+</section>
+
+<div class="screener-controls">
+  <input type="text" id="filter-ticker" placeholder="Filter ticker…" />
+  <select id="filter-sector">
+    <option value="">All sectors</option>
+  </select>
+  <select id="filter-decile">
+    <option value="">Any high-decile</option>
+    <option value="10">10 — strongest</option>
+    <option value="9">9</option>
+    <option value="8">8</option>
+    <option value="7">7</option>
+    <option value="6">6</option>
+    <option value="5">5</option>
+  </select>
+  <button class="btn btn-primary" id="btn-reset">Reset</button>
+</div>
+
+<div class="table-wrap">
+  <table class="table" id="screener-table">
+    <thead>
+      <tr>
+        <th data-sort="rank">Rank</th>
+        <th data-sort="ticker">Ticker</th>
+        <th data-sort="sector">Sector</th>
+        <th data-sort="high_decile_4w">4w</th>
+        <th data-sort="high_decile_12w">12w</th>
+        <th data-sort="high_decile_26w">26w</th>
+        <th data-sort="high_decile_52w">52w</th>
+        <th data-sort="composite_score">Score</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+<p class="muted" id="screener-count"></p>
+{% endblock %}

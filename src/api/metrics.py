@@ -2,13 +2,44 @@
 
 import logging
 
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
-from src.core.market_highs_importer import load_breadth, load_detail
+from src.core.market_highs_importer import (
+    load_breadth,
+    load_detail,
+    get_ticker_profile,
+)
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+AVAILABLE_METRICS = [
+    "off_high_pct",
+    "off_low_pct",
+    "off_high_decile",
+    "off_low_decile",
+    "at_high",
+    "at_low",
+    "recent_close",
+    "period_high_value",
+    "period_low_value",
+]
+
+
+@router.get("/available")
+async def list_available_metrics() -> dict:
+    """List all available metrics exposed by the API."""
+    return {"metrics": AVAILABLE_METRICS}
+
+
+@router.get("/{ticker}")
+async def get_metrics(ticker: str) -> dict:
+    """Get computed metrics for a single ticker (multi-duration profile)."""
+    profile = get_ticker_profile(ticker)
+    if not profile:
+        raise HTTPException(status_code=404, detail=f"Ticker {ticker.upper()} not found")
+    return {"ticker": ticker.upper(), "metrics": AVAILABLE_METRICS, "profile": profile}
 
 
 @router.get("/breadth")

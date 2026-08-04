@@ -7,6 +7,7 @@ from fastapi import APIRouter, HTTPException
 from src.core.market_highs_importer import (
     load_leaderboard,
     get_ticker_profile,
+    load_price_history,
     DURATIONS,
 )
 
@@ -48,3 +49,12 @@ async def get_stock(ticker: str) -> dict:
     if not profile:
         raise HTTPException(status_code=404, detail=f"Ticker {ticker.upper()} not found")
     return profile
+
+
+@router.get("/{ticker}/chart")
+async def get_stock_chart(ticker: str, limit: int = 2520) -> dict:
+    """Return daily OHLCV price history for charting (10 years by default)."""
+    history = load_price_history(ticker, limit=limit)
+    if not history:
+        raise HTTPException(status_code=404, detail=f"No price history for {ticker.upper()}")
+    return history

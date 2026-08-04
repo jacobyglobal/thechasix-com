@@ -21,6 +21,7 @@ from src.config import DATA_DIR
 logger = logging.getLogger(__name__)
 
 MARKETHIGHS_DIR = DATA_DIR / "markethighs"
+PARQUET_DIR = MARKETHIGHS_DIR / "parquet"
 DETAIL_CSV = MARKETHIGHS_DIR / "detail.csv"
 DETAIL_JSON = MARKETHIGHS_DIR / "detail.json"
 LEADERBOARD_CSV = MARKETHIGHS_DIR / "leaderboard.csv"
@@ -111,3 +112,38 @@ def build_decile_matrix() -> pd.DataFrame:
             row[f"off_low_{d}"] = float(r["off_low_pct"])
         rows.append(row)
     return pd.DataFrame(rows).set_index("ticker")
+
+
+def list_available_tickers() -> list[str]:
+    """Return the set of tickers available in the parquet price files."""
+    if not PARQUET_DIR.exists():
+        return []
+    return sorted(p.stem for p in PARQUET_DIR.glob("*.parquet"))
+
+
+def load_price_history(ticker: str, limit: int = 2520) -> dict:
+    """Load daily OHLCV history for a single ticker from the parquet cache.
+
+    Files are yfinance-format: a DataFrame indexed by date with columns
+    including Close, High, Low, Open, Volume. Returns the most recent `limit`
+    rows as a list of dicts plus metadata. Default 2520 rows ~ 10 years.
+    """
+    ticker = ticker.upper()
+    path = PARQUET_DIR / f"{ticker}.parquet"
+    if not path.exists():
+        return {}
+    df = pd.read_parquet(path).reset_index()
+    df.columns = [str(c).strip().lower() for c in df.columns]
+    if "date" in df.columns:
+        date_col = "date"
+    elif df.columns[0].startswith("datetime"):
+        date_col = df.columns[0]
+    else:
+        date_col = df.columns[0]
+    df = df.sort_values(date_col).tail(limit)
+    records = df.to_dict(orient="records")
+    return {
+        "ticker": ticker,
+        "count": len(records),
+        "items": records,
+    }

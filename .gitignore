@@ -46,3 +46,11 @@ data/logs/
 *.db
 *.sqlite
 *.db-journal
+
+# Local planning & agent configuration files
+gemini.md
+plan.md
+plan.human.md
+status.md
+opencode.json
+

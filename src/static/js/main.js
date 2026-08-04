@@ -38,15 +38,17 @@
     return "rgb(" + r + "," + g + "," + b + ")";
   }
 
-  /* One duration cell: off-high ln-distance on top, period high price below. */
-  function durationCell(row, d) {
-    var dec = row["high_decile_" + d];
-    var pct = row["off_high_pct_" + d];
-    var high = row["high_" + d];
+  /* One duration cell: distance % on top, period extreme price below,
+     heat-colored by proximity decile (10 = nearest the extreme = black). */
+  function durationCell(row, d, mode) {
+    var fromHigh = mode !== "low";
+    var dec = row[fromHigh ? "high_decile_" + d : "low_decile_" + d];
+    var pct = row[fromHigh ? "off_high_pct_" + d : "off_low_pct_" + d];
+    var price = row[fromHigh ? "high_" + d : "low_" + d];
     var bg = heatColor(dec);
     return "<td style='background:" + bg + ";'>" +
       "<div class='cell-pct'>" + fmtPct(pct) + "</div>" +
-      "<div class='cell-high'>" + fmtNum(high) + "</div></td>";
+      "<div class='cell-high'>" + fmtNum(price) + "</div></td>";
   }
 
   /* ---- Landing: market breadth ---- */
@@ -107,6 +109,7 @@
   /* ---- Screener: load, filter, sort ---- */
   var screenerRows = [];
   var screenerSort = { key: "rank", asc: true };
+  var screenerMode = "high";
 
   function populateSectors(items) {
     var select = document.getElementById("filter-sector");
@@ -128,11 +131,12 @@
     var tickerFilter = (document.getElementById("filter-ticker").value || "").toLowerCase();
     var sector = document.getElementById("filter-sector").value;
     var decile = document.getElementById("filter-decile").value;
+    var decileCol = screenerMode === "low" ? "low_decile_52w" : "high_decile_52w";
 
     var rows = screenerRows.filter(function (row) {
       if (tickerFilter && row.ticker.toLowerCase().indexOf(tickerFilter) === -1) return false;
       if (sector && row.sector !== sector) return false;
-      if (decile && row.high_decile_52w !== Number(decile)) return false;
+      if (decile && row[decileCol] !== Number(decile)) return false;
       return true;
     });
 
@@ -151,14 +155,51 @@
         "<td><a href='/stock.html?ticker=" + row.ticker + "'>" + row.ticker + "</a></td>" +
         "<td>" + row.sector + "</td>" +
         "<td>" + fmtNum(row.close) + "</td>" +
-        durationCell(row, "4w") +
-        durationCell(row, "12w") +
-        durationCell(row, "26w") +
-        durationCell(row, "52w") +
+        durationCell(row, "4w", screenerMode) +
+        durationCell(row, "12w", screenerMode) +
+        durationCell(row, "26w", screenerMode) +
+        durationCell(row, "52w", screenerMode) +
         "<td>" + fmtNum(row.composite_score) + "</td>";
       tbody.appendChild(tr);
     });
     count.textContent = rows.length + " results";
+  }
+
+  function setScreenerMode(mode) {
+    screenerMode = mode === "low" ? "low" : "high";
+    var fromHigh = screenerMode === "high";
+
+    document.querySelectorAll(".mode-btn").forEach(function (btn) {
+      btn.classList.toggle("active", btn.getAttribute("data-mode") === screenerMode);
+    });
+
+    var decileTop = document.querySelector("#filter-decile option[value='10']");
+    if (decileTop) decileTop.textContent = "10 — " + (fromHigh ? "strongest" : "nearest low");
+
+    var note = document.getElementById("screener-note");
+    if (note) {
+      note.textContent = fromHigh
+        ? "Duration cells show % off period high (ln) over the period high price; color = distance from high (black = near, red = far)."
+        : "Duration cells show % off period low (ln) over the period low price; color = distance from low (black = near, red = far).";
+    }
+
+    var table = document.getElementById("screener-table");
+    if (table) {
+      table.querySelectorAll("th[data-sort]").forEach(function (th) {
+        var key = th.getAttribute("data-sort");
+        if (key.indexOf("off_high_pct_") === 0) {
+          th.setAttribute("data-sort", "off_low_pct_" + key.slice("off_high_pct_".length));
+        } else if (key.indexOf("off_low_pct_") === 0) {
+          th.setAttribute("data-sort", "off_high_pct_" + key.slice("off_low_pct_".length));
+        }
+      });
+    }
+    if (screenerSort.key.indexOf("off_high_pct_") === 0) {
+      screenerSort.key = "off_low_pct_" + screenerSort.key.slice("off_high_pct_".length);
+    } else if (screenerSort.key.indexOf("off_low_pct_") === 0) {
+      screenerSort.key = "off_high_pct_" + screenerSort.key.slice("off_low_pct_".length);
+    }
+    renderScreener();
   }
 
   function loadScreener() {
@@ -349,6 +390,11 @@
         document.getElementById("filter-sector").value = "";
         document.getElementById("filter-decile").value = "";
         renderScreener();
+      });
+      document.querySelectorAll(".mode-btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          setScreenerMode(btn.getAttribute("data-mode"));
+        });
       });
       table.querySelectorAll("th[data-sort]").forEach(function (th) {
         th.addEventListener("click", function () {

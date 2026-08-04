@@ -70,6 +70,14 @@ def _log_distance(close: float, high: float) -> float:
     return math.log(close / high) * 100.0
 
 
+def _as_decile(value) -> float:
+    """Coerce a decile value to int, tolerating NaN/None."""
+    try:
+        return int(float(value))
+    except (TypeError, ValueError):
+        return float("nan")
+
+
 def load_leaderboard_enriched() -> pd.DataFrame:
     """Leaderboard enriched with as-of date, close, and per-duration data.
 
@@ -77,6 +85,8 @@ def load_leaderboard_enriched() -> pd.DataFrame:
       - date: most recent price date across the dataset
       - close: most recent close price
       - high_{duration}: period high value for that horizon
+      - low_{duration}: period low value for that horizon
+      - low_decile_{duration}: proximity decile (10 = nearest the period low)
       - off_high_pct_{duration}: natural-log distance ln(close/high)*100
     """
     lb = load_leaderboard()
@@ -87,6 +97,8 @@ def load_leaderboard_enriched() -> pd.DataFrame:
         lb["close"] = float("nan")
         for d in DURATIONS:
             lb[f"high_{d}"] = float("nan")
+            lb[f"low_{d}"] = float("nan")
+            lb[f"low_decile_{d}"] = float("nan")
         return lb
 
     as_of = str(detail["date"].max())
@@ -101,12 +113,22 @@ def load_leaderboard_enriched() -> pd.DataFrame:
         (row["ticker"], row["duration"]): float(row["period_high_value"])
         for _, row in latest.iterrows()
     }
+    low_map = {
+        (row["ticker"], row["duration"]): float(row["period_low_value"])
+        for _, row in latest.iterrows()
+    }
+    low_decile_map = {
+        (row["ticker"], row["duration"]): _as_decile(row["off_low_decile"])
+        for _, row in latest.iterrows()
+    }
 
     lb = lb.copy()
     lb["date"] = as_of
     lb["close"] = lb["ticker"].map(close_map)
     for d in DURATIONS:
         lb[f"high_{d}"] = lb["ticker"].apply(lambda t, d=d: high_map.get((t, d), float("nan")))
+        lb[f"low_{d}"] = lb["ticker"].apply(lambda t, d=d: low_map.get((t, d), float("nan")))
+        lb[f"low_decile_{d}"] = lb["ticker"].apply(lambda t, d=d: low_decile_map.get((t, d), float("nan")))
         lb[f"off_high_pct_{d}"] = lb.apply(
             lambda r, d=d: _log_distance(r["close"], r[f"high_{d}"]), axis=1
         )

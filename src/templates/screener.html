@@ -11,8 +11,12 @@
   <select id="filter-sector">
     <option value="">All sectors</option>
   </select>
+  <div class="screener-toggle" id="screener-mode-toggle">
+    <button type="button" class="mode-btn active" data-mode="high">% Off Highs</button>
+    <button type="button" class="mode-btn" data-mode="low">% Off Lows</button>
+  </div>
   <select id="filter-decile">
-    <option value="">Any high-decile</option>
+    <option value="">Any decile</option>
     <option value="10">10 — strongest</option>
     <option value="9">9</option>
     <option value="8">8</option>
@@ -42,6 +46,6 @@
     <tbody></tbody>
   </table>
 </div>
-<p class="muted" style="font-size:0.8rem;">Duration cells show % off period high (ln) over the period high price; color = distance from high (black = near, red = far).</p>
+<p class="muted" style="font-size:0.8rem;" id="screener-note">Duration cells show % off period high (ln) over the period high price; color = distance from high (black = near, red = far).</p>
 <p class="muted" id="screener-count"></p>
 {% endblock %}

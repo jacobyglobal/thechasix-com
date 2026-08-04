@@ -143,6 +143,24 @@ main.container { padding-top: 32px; padding-bottom: 64px; }
 .screener-controls input:focus, .screener-controls select:focus { outline: none; border-color: var(--accent); }
 #screener-count { margin-top: 12px; }
 
+/* Screener high/low mode toggle */
+.screener-toggle { display: inline-flex; gap: 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.mode-btn {
+  background: var(--bg-card);
+  color: var(--muted);
+  border: none;
+  padding: 9px 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.mode-btn + .mode-btn { border-left: 1px solid var(--border); }
+.mode-btn:hover { color: var(--accent-hover); }
+.mode-btn.active { background: var(--accent); color: #fff; }
+.mode-btn.active:hover { color: #fff; }
+
 /* Detail */
 .detail-grid { display: grid; grid-template-columns: 1.4fr 1fr; gap: 24px; margin-bottom: 24px; }
 @media (max-width: 860px) { .detail-grid { grid-template-columns: 1fr; } }

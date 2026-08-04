@@ -291,4 +291,6 @@
   } else {
     init();
   }
+
+  window.loadDetail = loadDetail;
 })();

@@ -19,6 +19,17 @@ logger = logging.getLogger(__name__)
 Base = declarative_base()
 
 
+def _async_url(url: str) -> str:
+    """Convert a sync DB URL to its async driver equivalent.
+
+    Local dev uses sqlite (needs aiosqlite); production uses PostgreSQL
+    (asyncpg is already async).
+    """
+    if url.startswith("sqlite"):
+        return url.replace("sqlite://", "sqlite+aiosqlite://", 1)
+    return url
+
+
 class CacheEntry(Base):
     """Cache entry for API responses."""
 
@@ -31,7 +42,7 @@ class CacheEntry(Base):
     data_type = Column(String(50))
 
 
-engine = create_async_engine(DATABASE_URL)
+engine = create_async_engine(_async_url(DATABASE_URL))
 AsyncSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 

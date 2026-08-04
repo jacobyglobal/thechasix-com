@@ -29,8 +29,11 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     """Initialize services on startup."""
     logger.info("Initializing database connections...")
-    await init_db()
-    logger.info("Database initialized.")
+    try:
+        await init_db()
+        logger.info("Database initialized.")
+    except Exception as exc:  # noqa: BLE001
+        logger.warning("Database initialization failed (continuing without DB): %s", exc)
     yield
     logger.info("Shutting down...")
     await schwab_client.close()

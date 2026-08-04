@@ -22,6 +22,7 @@
   </select>
   <button class="btn btn-primary" id="btn-reset">Reset</button>
 </div>
+<p class="muted" id="screener-date"></p>
 
 <div class="table-wrap">
   <table class="table" id="screener-table">
@@ -30,15 +31,17 @@
         <th data-sort="rank">Rank</th>
         <th data-sort="ticker">Ticker</th>
         <th data-sort="sector">Sector</th>
-        <th data-sort="high_decile_4w">4w</th>
-        <th data-sort="high_decile_12w">12w</th>
-        <th data-sort="high_decile_26w">26w</th>
-        <th data-sort="high_decile_52w">52w</th>
+        <th data-sort="close">Close</th>
+        <th data-sort="off_high_pct_4w">4w</th>
+        <th data-sort="off_high_pct_12w">12w</th>
+        <th data-sort="off_high_pct_26w">26w</th>
+        <th data-sort="off_high_pct_52w">52w</th>
         <th data-sort="composite_score">Score</th>
       </tr>
     </thead>
     <tbody></tbody>
   </table>
 </div>
+<p class="muted" style="font-size:0.8rem;">Duration cells show % off period high (ln) over the period high price; color = closeness to high (dark = far, red = near).</p>
 <p class="muted" id="screener-count"></p>
 {% endblock %}

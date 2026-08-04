@@ -6,24 +6,38 @@
 
   function fmtPct(v) {
     if (v === null || v === undefined || isNaN(v)) return "—";
-    return v.toFixed(1) + "%";
+    return v.toFixed(2) + "%";
   }
 
   function fmtNum(v) {
     if (v === null || v === undefined || isNaN(v)) return "—";
-    return Number(v).toLocaleString("en-US", { maximumFractionDigits: 2 });
+    return Number(v).toFixed(2);
   }
 
-  function decileClass(d) {
-    if (d === null || d === undefined || isNaN(d)) return "decile-weak";
-    if (d >= 8) return "decile-strong";
-    if (d >= 5) return "decile-mid";
-    return "decile-weak";
+  function fmtDate(v) {
+    if (!v) return "";
+    return String(v).slice(0, 10);
   }
 
-  function decilePill(d) {
-    if (d === null || d === undefined || isNaN(d)) return "<span class='decile-pill decile-weak'>—</span>";
-    return "<span class='decile-pill " + decileClass(d) + "'>" + d + "</span>";
+  /* Heatmap: decile 1 (farthest from high) = dark, decile 10 (closest) = accent red. */
+  function heatColor(d) {
+    if (d === null || d === undefined || isNaN(d)) return "transparent";
+    var t = Math.max(0, Math.min(1, (d - 1) / 9));
+    var r = Math.round(25 + (225 - 25) * t);
+    var g = Math.round(25 + (29 - 25) * t);
+    var b = Math.round(29 + (46 - 29) * t);
+    return "rgb(" + r + "," + g + "," + b + ")";
+  }
+
+  /* One duration cell: off-high ln-distance on top, period high price below. */
+  function durationCell(row, d) {
+    var dec = row["high_decile_" + d];
+    var pct = row["off_high_pct_" + d];
+    var high = row["high_" + d];
+    var bg = heatColor(dec);
+    return "<td style='background:" + bg + ";'>" +
+      "<div class='cell-pct'>" + fmtPct(pct) + "</div>" +
+      "<div class='cell-high'>" + fmtNum(high) + "</div></td>";
   }
 
   /* ---- Landing: market breadth ---- */
@@ -60,7 +74,7 @@
     fetch(API_ROOT + "/api/stocks?limit=10")
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(function (data) {
-        label.textContent = "Top 10 composite market profiles.";
+        label.textContent = "As of " + fmtDate(data.as_of) + " — top 10 composite market profiles.";
         tbody.innerHTML = "";
         data.items.forEach(function (row) {
           var tr = document.createElement("tr");
@@ -68,10 +82,11 @@
             "<td>" + row.rank + "</td>" +
             "<td><a href='/stock.html?ticker=" + row.ticker + "'>" + row.ticker + "</a></td>" +
             "<td>" + row.sector + "</td>" +
-            "<td>" + decilePill(row.high_decile_4w) + "</td>" +
-            "<td>" + decilePill(row.high_decile_12w) + "</td>" +
-            "<td>" + decilePill(row.high_decile_26w) + "</td>" +
-            "<td>" + decilePill(row.high_decile_52w) + "</td>" +
+            "<td>" + fmtNum(row.close) + "</td>" +
+            durationCell(row, "4w") +
+            durationCell(row, "12w") +
+            durationCell(row, "26w") +
+            durationCell(row, "52w") +
             "<td>" + fmtNum(row.composite_score) + "</td>";
           tbody.appendChild(tr);
         });
@@ -127,10 +142,11 @@
         "<td>" + row.rank + "</td>" +
         "<td><a href='/stock.html?ticker=" + row.ticker + "'>" + row.ticker + "</a></td>" +
         "<td>" + row.sector + "</td>" +
-        "<td>" + decilePill(row.high_decile_4w) + "</td>" +
-        "<td>" + decilePill(row.high_decile_12w) + "</td>" +
-        "<td>" + decilePill(row.high_decile_26w) + "</td>" +
-        "<td>" + decilePill(row.high_decile_52w) + "</td>" +
+        "<td>" + fmtNum(row.close) + "</td>" +
+        durationCell(row, "4w") +
+        durationCell(row, "12w") +
+        durationCell(row, "26w") +
+        durationCell(row, "52w") +
         "<td>" + fmtNum(row.composite_score) + "</td>";
       tbody.appendChild(tr);
     });
@@ -139,10 +155,12 @@
 
   function loadScreener() {
     var count = document.getElementById("screener-count");
+    var dateEl = document.getElementById("screener-date");
     fetch(API_ROOT + "/api/stocks?limit=200")
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(function (data) {
         screenerRows = data.items;
+        if (dateEl) dateEl.textContent = "As of " + fmtDate(data.as_of);
         populateSectors(screenerRows);
         renderScreener();
       })
@@ -164,20 +182,21 @@
       })
       .then(function (profile) {
         document.getElementById("detail-ticker").textContent = profile.ticker;
-        document.getElementById("detail-sector").textContent = profile.sector;
+        document.getElementById("detail-sector").textContent =
+          profile.sector + " · close " + fmtNum(profile.close) + " · as of " + fmtDate(profile.date);
         var tbody = document.querySelector("#profile-table tbody");
         tbody.innerHTML = "";
         ["4w", "12w", "26w", "52w"].forEach(function (d) {
           var row = profile.durations[d];
           if (!row) return;
+          var bg = heatColor(row.off_high_decile);
           var tr = document.createElement("tr");
           tr.innerHTML =
             "<td>" + d + "</td>" +
             "<td>" + row.days + "</td>" +
-            "<td>" + fmtNum(row.recent_close) + "</td>" +
-            "<td>" + fmtPct(row.off_high_pct) + "</td>" +
+            "<td>" + fmtNum(row.period_high_value) + "</td>" +
+            "<td style='background:" + bg + ";'>" + fmtPct(row.off_high_pct) + "</td>" +
             "<td>" + fmtPct(row.off_low_pct) + "</td>" +
-            "<td>" + decilePill(row.off_high_decile) + "</td>" +
             "<td>" + (row.at_high ? "<strong style='color:var(--accent)'>Yes</strong>" : "No") + "</td>";
           tbody.appendChild(tr);
         });

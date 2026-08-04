@@ -5,7 +5,7 @@ import logging
 from fastapi import APIRouter, HTTPException
 
 from src.core.market_highs_importer import (
-    load_leaderboard,
+    load_leaderboard_enriched,
     get_ticker_profile,
     load_price_history,
     DURATIONS,
@@ -31,7 +31,7 @@ async def list_stocks(
         sector: optional sector name filter
         limit: max number of rows
     """
-    df = load_leaderboard()
+    df = load_leaderboard_enriched()
     if sector:
         df = df[df["sector"].str.lower() == sector.lower()]
     if sort_by in df.columns:
@@ -39,7 +39,7 @@ async def list_stocks(
     df = df.head(limit)
 
     records = df.to_dict(orient="records")
-    return {"count": len(records), "durations": DURATIONS, "items": records}
+    return {"count": len(records), "durations": DURATIONS, "as_of": df["date"].iloc[0] if len(df) else "", "items": records}
 
 
 @router.get("/{ticker}")

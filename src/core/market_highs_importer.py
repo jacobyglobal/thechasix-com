@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import json
 import logging
+import math
 from pathlib import Path
 
 import pandas as pd
@@ -62,6 +63,56 @@ def load_leaderboard() -> pd.DataFrame:
     return df
 
 
+def _log_distance(close: float, high: float) -> float:
+    """Natural-log distance from a period high: ln(close / high) * 100."""
+    if high is None or high <= 0 or close is None or close <= 0:
+        return float("nan")
+    return math.log(close / high) * 100.0
+
+
+def load_leaderboard_enriched() -> pd.DataFrame:
+    """Leaderboard enriched with as-of date, close, and per-duration data.
+
+    For every leaderboard row adds:
+      - date: most recent price date across the dataset
+      - close: most recent close price
+      - high_{duration}: period high value for that horizon
+      - off_high_pct_{duration}: natural-log distance ln(close/high)*100
+    """
+    lb = load_leaderboard()
+    detail = load_detail()
+
+    if detail.empty:
+        lb["date"] = ""
+        lb["close"] = float("nan")
+        for d in DURATIONS:
+            lb[f"high_{d}"] = float("nan")
+        return lb
+
+    as_of = str(detail["date"].max())
+
+    # Most recent row per ticker per duration
+    detail = detail.sort_values("date")
+    latest = detail.groupby(["ticker", "duration"]).tail(1)
+    latest["duration"] = latest["duration"].astype(str)
+
+    close_map = latest.groupby("ticker")["recent_close"].last().to_dict()
+    high_map = {
+        (row["ticker"], row["duration"]): float(row["period_high_value"])
+        for _, row in latest.iterrows()
+    }
+
+    lb = lb.copy()
+    lb["date"] = as_of
+    lb["close"] = lb["ticker"].map(close_map)
+    for d in DURATIONS:
+        lb[f"high_{d}"] = lb["ticker"].apply(lambda t, d=d: high_map.get((t, d), float("nan")))
+        lb[f"off_high_pct_{d}"] = lb.apply(
+            lambda r, d=d: _log_distance(r["close"], r[f"high_{d}"]), axis=1
+        )
+    return lb
+
+
 def load_breadth() -> pd.DataFrame:
     """Load aggregate market breadth stats per duration."""
     return pd.read_csv(BREADTH_CSV)
@@ -70,21 +121,32 @@ def load_breadth() -> pd.DataFrame:
 def get_ticker_profile(ticker: str) -> dict:
     """Return the full multi-duration profile for a single ticker.
 
-    Returns a dict keyed by duration containing off-high/off-low percentages
-    and deciles, plus the ticker metadata.
+    Returns a dict keyed by duration containing natural-log off-high/off-low
+    distances, deciles, and the ticker metadata. `off_high_pct` is the
+    natural-log distance ln(close/high)*100.
     """
     detail = load_detail()
     rows = detail[detail["ticker"] == ticker.upper()]
     if rows.empty:
         return {}
-    profile = {"ticker": ticker.upper(), "sector": rows.iloc[0]["sector"], "durations": {}}
+    as_of = str(rows["date"].max())
+    close = float(rows.sort_values("date")["recent_close"].iloc[-1])
+    profile = {
+        "ticker": ticker.upper(),
+        "sector": rows.iloc[0]["sector"],
+        "date": as_of,
+        "close": close,
+        "durations": {},
+    }
     for _, row in rows.iterrows():
+        high = float(row["period_high_value"])
+        low = float(row["period_low_value"])
         profile["durations"][row["duration"]] = {
             "days": int(row["days"]),
             "recent_close": float(row["recent_close"]),
-            "period_high_value": float(row["period_high_value"]),
-            "period_low_value": float(row["period_low_value"]),
-            "off_high_pct": float(row["off_high_pct"]),
+            "period_high_value": high,
+            "period_low_value": low,
+            "off_high_pct": _log_distance(profile["close"], high),
             "off_low_pct": float(row["off_low_pct"]),
             "at_high": bool(row["at_high"]),
             "at_low": bool(row["at_low"]),

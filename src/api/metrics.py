@@ -46,11 +46,14 @@ async def market_extremes(limit: int = 10) -> dict:
     """Return tickers currently at/near their period highs or lows.
 
     Uses the detail rows across all durations to surface the strongest
-    and weakest market profiles by off-high/off-low decile.
+    and weakest market profiles by off-high/off-low decile (both deciles
+    strength-polarity: 10 = nearest high / farthest off low).
     """
     df = load_detail()
     df["off_high_decile"] = df["off_high_decile"].astype(int)
-    df["off_low_decile"] = df["off_low_decile"].astype(int)
+    # Raw off_low_decile is proximity-polarity (10 = nearest the low); reflect
+    # to strength polarity (10 = farthest off the low) to match off_high_decile.
+    df["off_low_decile"] = 11 - df["off_low_decile"].astype(int)
 
     strongest = (
         df.sort_values(["off_high_decile", "off_low_decile"], ascending=[False, False])

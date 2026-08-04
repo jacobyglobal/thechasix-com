@@ -78,6 +78,20 @@ def _as_decile(value) -> float:
         return float("nan")
 
 
+def _low_strength_decile(value) -> float:
+    """Invert the raw low-proximity decile to a strength decile.
+
+    The data files store off_low_decile as proximity (10 = nearest the period
+    low). To keep a uniform display/ranking polarity with off_high_decile
+    (10 = strongest), we reflect it so 10 = farthest off the low (biggest
+    bounce) and 1 = nearest the low.
+    """
+    dec = _as_decile(value)
+    if math.isnan(dec):
+        return float("nan")
+    return 11 - int(dec)
+
+
 def load_leaderboard_enriched() -> pd.DataFrame:
     """Leaderboard enriched with as-of date, close, and per-duration data.
 
@@ -86,7 +100,8 @@ def load_leaderboard_enriched() -> pd.DataFrame:
       - close: most recent close price
       - high_{duration}: period high value for that horizon
       - low_{duration}: period low value for that horizon
-      - low_decile_{duration}: proximity decile (10 = nearest the period low)
+      - low_decile_{duration}: strength decile (10 = farthest from the period
+        low, strongest bounce; 1 = nearest the low)
       - off_high_pct_{duration}: natural-log distance ln(close/high)*100
     """
     lb = load_leaderboard()
@@ -118,7 +133,7 @@ def load_leaderboard_enriched() -> pd.DataFrame:
         for _, row in latest.iterrows()
     }
     low_decile_map = {
-        (row["ticker"], row["duration"]): _as_decile(row["off_low_decile"])
+        (row["ticker"], row["duration"]): _low_strength_decile(row["off_low_decile"])
         for _, row in latest.iterrows()
     }
 

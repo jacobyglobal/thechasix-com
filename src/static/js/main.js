@@ -28,7 +28,8 @@
     return m[2] + "-" + m[3] + "-" + m[1];
   }
 
-  /* Heatmap: decile 10 (closest to high) = black, decile 1 (farthest) = accent red. */
+  /* Heatmap: decile 10 = strongest (top of range) = black,
+     decile 1 = weakest (bottom of range) = accent red. */
   function heatColor(d) {
     if (d === null || d === undefined || isNaN(d)) return "transparent";
     var t = Math.max(0, Math.min(1, (10 - d) / 9));
@@ -38,8 +39,9 @@
     return "rgb(" + r + "," + g + "," + b + ")";
   }
 
-  /* One duration cell: distance % on top, period extreme price below,
-     heat-colored by proximity decile (10 = nearest the extreme = black). */
+  /* One duration cell: distance % on top, period extreme price below.
+     Both modes share one polarity: decile 10 (black) = strongest — nearest
+     the high, or farthest off the low (biggest bounce). */
   function durationCell(row, d, mode) {
     var fromHigh = mode !== "low";
     var dec = row[fromHigh ? "high_decile_" + d : "low_decile_" + d];
@@ -174,13 +176,13 @@
     });
 
     var decileTop = document.querySelector("#filter-decile option[value='10']");
-    if (decileTop) decileTop.textContent = "10 — " + (fromHigh ? "strongest" : "nearest low");
+    if (decileTop) decileTop.textContent = "10 — " + (fromHigh ? "strongest" : "strongest (farthest off low)");
 
     var note = document.getElementById("screener-note");
     if (note) {
       note.textContent = fromHigh
-        ? "Duration cells show % off period high (ln) over the period high price; color = distance from high (black = near, red = far)."
-        : "Duration cells show % off period low (ln) over the period low price; color = distance from low (black = near, red = far).";
+        ? "Duration cells show % off period high (ln) over the period high price; color = strength (black = nearest high, red = deepest drawdown)."
+        : "Duration cells show % off period low (ln) over the period low price; color = strength (black = farthest off low, red = sitting at low).";
     }
 
     var table = document.getElementById("screener-table");

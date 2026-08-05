@@ -25,6 +25,8 @@
   var guideByName = {};
   var sortKey = "Ticker";
   var sortAsc = true;
+  var page = 1;
+  var pageSize = 10;
 
   function fmtNum(v, dec) {
     if (v === null || v === undefined || isNaN(v)) return "—";
@@ -70,22 +72,72 @@
     });
   }
 
+  function sortBy(key) {
+    if (sortKey === key) sortAsc = !sortAsc;
+    else { sortKey = key; sortAsc = true; }
+    render();
+    paintSort();
+  }
+
   function buildHeader() {
     var tr = document.querySelector("#watchlist-table thead tr");
     tr.innerHTML = "";
     columns.forEach(function (col) {
       var th = document.createElement("th");
       th.setAttribute("data-sort", col.name);
-      th.textContent = col.name;
-      th.addEventListener("click", function () {
-        if (sortKey === col.name) sortAsc = !sortAsc;
-        else { sortKey = col.name; sortAsc = true; }
-        render();
-        paintSort();
+
+      var label = document.createElement("span");
+      label.className = "col-label";
+      label.textContent = col.name;
+      th.appendChild(label);
+
+      var info = document.createElement("button");
+      info.type = "button";
+      info.className = "col-info";
+      info.title = "What is " + col.name + "?";
+      info.setAttribute("aria-label", "About " + col.name);
+      info.textContent = "i";
+      info.addEventListener("click", function (e) {
+        e.stopPropagation();
         openGuideFor(col.name);
       });
+      th.appendChild(info);
+
+      th.addEventListener("click", function () { sortBy(col.name); });
       tr.appendChild(th);
     });
+  }
+
+  function updateScrollHint() {
+    var table = document.getElementById("watchlist-table");
+    var wrap = table ? table.closest(".table-wrap") : null;
+    var hint = document.getElementById("watchlist-scroll-hint");
+    if (!wrap) return;
+    var canScroll = wrap.scrollWidth > wrap.clientWidth + 1;
+    wrap.classList.toggle("can-scroll", canScroll);
+    wrap.classList.toggle(
+      "scrolled-right",
+      canScroll && wrap.scrollLeft + wrap.clientWidth >= wrap.scrollWidth - 1
+    );
+    if (hint) hint.hidden = !canScroll;
+  }
+
+  function updatePagination(pages, total) {
+    var info = document.getElementById("page-info");
+    var prev = document.getElementById("page-prev");
+    var next = document.getElementById("page-next");
+    var per = pageSize || total;
+    if (info) {
+      if (pages <= 1) {
+        info.textContent = total ? "All " + total + " shown" : "";
+      } else {
+        var start = (page - 1) * per + 1;
+        var end = Math.min(page * per, total);
+        info.textContent = start + "–" + end + " of " + total;
+      }
+    }
+    if (prev) prev.disabled = pages <= 1 || page <= 1;
+    if (next) next.disabled = pages <= 1 || page >= pages;
   }
 
   function render() {
@@ -111,8 +163,15 @@
       return sortAsc ? av - bv : bv - av;
     });
 
+    var total = shown.length;
+    var per = pageSize || total;
+    var pages = Math.max(1, Math.ceil(total / per));
+    if (page > pages) page = pages;
+    var start = (page - 1) * per;
+    var pageRows = shown.slice(start, start + per);
+
     tbody.innerHTML = "";
-    shown.forEach(function (row) {
+    pageRows.forEach(function (row) {
       var tr = document.createElement("tr");
       var html = "";
       columns.forEach(function (col) {
@@ -123,7 +182,9 @@
       tr.innerHTML = html;
       tbody.appendChild(tr);
     });
-    count.textContent = shown.length + " of " + rows.length + " results";
+    count.textContent = total + " result" + (total === 1 ? "" : "s");
+    updatePagination(pages, total);
+    updateScrollHint();
   }
 
   /* ---- Column guide accordion ---- */
@@ -226,9 +287,12 @@
         rows = data.items;
         columns = data.columns;
         if (dateEl) dateEl.textContent = "As of " + fmtDate(data.as_of) + " — 18 months of daily data.";
+        var hint = document.getElementById("watchlist-scroll-hint");
+        if (hint) hint.textContent = "Scroll right for all " + columns.length + " columns.";
         buildHeader();
         render();
         paintSort();
+        updateScrollHint();
         loadGuide();
       })
       .catch(function (err) {
@@ -241,10 +305,14 @@
     var table = document.getElementById("watchlist-table");
     if (!table) return;
     var filter = document.getElementById("filter-ticker");
-    if (filter) filter.addEventListener("input", render);
+    if (filter) filter.addEventListener("input", function () {
+      page = 1;
+      render();
+    });
     var reset = document.getElementById("btn-reset");
     if (reset) reset.addEventListener("click", function () {
       filter.value = "";
+      page = 1;
       render();
     });
     var toggle = document.getElementById("btn-guide-toggle");
@@ -259,6 +327,26 @@
       }
       toggle.textContent = willHide ? "Column Guide" : "Close Column Guide";
     });
+    var prev = document.getElementById("page-prev");
+    var next = document.getElementById("page-next");
+    if (prev) prev.addEventListener("click", function () {
+      if (page > 1) { page--; render(); }
+    });
+    if (next) next.addEventListener("click", function () {
+      page++;
+      render();
+    });
+    var sizeSel = document.getElementById("page-size-select");
+    if (sizeSel) sizeSel.addEventListener("change", function () {
+      pageSize = Number(sizeSel.value) || 0;
+      page = 1;
+      render();
+    });
+    var wrap = table.closest(".table-wrap");
+    if (wrap) {
+      wrap.addEventListener("scroll", updateScrollHint);
+      window.addEventListener("resize", updateScrollHint);
+    }
     load();
   }
 

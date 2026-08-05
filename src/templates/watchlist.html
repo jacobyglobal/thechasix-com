@@ -4,7 +4,7 @@
 {% block content %}
 <section class="page-head">
   <h1>Stock Watchlist</h1>
-  <p class="muted">Daily watchlist of liquid names — ATR, 52-wk range, DeMark rank, and volume vs the QQQ market. Click any column header to sort or see its definition.</p>
+  <p class="muted">Daily watchlist of liquid names — ATR, 52-wk range, DeMark rank, and volume vs the QQQ market. Click a column header to sort; hover the ⓘ to see that column's definition.</p>
 </section>
 
 <div class="screener-controls">
@@ -22,7 +22,24 @@
     <tbody></tbody>
   </table>
 </div>
-<p class="muted" id="watchlist-count"></p>
+<p class="muted" id="watchlist-scroll-hint" hidden></p>
+
+<div class="watchlist-pagination">
+  <span class="muted" id="watchlist-count"></span>
+  <span class="page-nav">
+    <button type="button" class="page-btn" id="page-prev">Prev</button>
+    <span class="page-info" id="page-info"></span>
+    <button type="button" class="page-btn" id="page-next">Next</button>
+  </span>
+  <label class="page-size" for="page-size-select">Show
+    <select id="page-size-select">
+      <option value="10" selected>10</option>
+      <option value="25">25</option>
+      <option value="50">50</option>
+      <option value="0">All</option>
+    </select>
+  </label>
+</div>
 
 <div class="guide-panel" id="guide-panel" hidden>
   <h2>Column Guide</h2>

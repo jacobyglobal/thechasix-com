@@ -9,7 +9,7 @@ columns to daily OHLCV data.
 
 | File | Contents |
 |------|----------|
-| `watchlist.csv` | One row per ticker: the latest bar's base OHLCV + computed columns (22 columns, 25 tickers incl. QQQ benchmark). |
+| `watchlist.csv` | One row per ticker: the latest bar's base OHLCV + computed columns (24 columns, 26 rows = 25 tickers + QQQ benchmark). |
 | `column_guide.json` | Per-column `{name, kind, formula, meaning, recompute}` metadata for the UI's column guide (base / intermediate / computed). |
 | `README.md` | This file. |
 
@@ -33,9 +33,14 @@ cp output/column_guide.json ~/Documents/GeminiProjects/TheChasIX.com/data/watchl
 ## Notes
 
 - 18 months of daily OHLCV from yfinance (raw/unadjusted prices).
-- All lookbacks standardized to 21 bars, except DeMark High Low Rank which uses
-  the 52-week (252-trading-day) high/low.
-- `Relative Vol vs QQQ Market` benchmarks each ticker's volume against the QQQ
-  row's own `Vol % of Vol Median 21` (QQQ is itself a watchlist row).
+- All lookbacks standardized to 21 bars, except TD Range Rank and Jacoby Range
+  Index which use 52-week (252-trading-day) / multi-timeframe high/low
+  lookbacks, and Jacoby Volume Profile Oscillator which uses 20- and 252-bar
+  synthetic VPOC windows.
+- `Idiosyncratic RVOL` benchmarks each ticker's volume against the QQQ
+  row's own `Relative Volume (RVOL Median)` (QQQ is itself a watchlist row).
+- `Jacoby Range Index` (multi-timeframe DeMark position score) and `Jacoby
+  Volume Profile Oscillator` (fast/slow VPOC migration) are documented in the
+  WatchList project's `docs/columns_logic.md` and mirrored in `column_guide.json`.
 - Future: expand the universe (SP500 / Nasdaq100 / Russell2000, up to ~3000
   rows) and migrate from yfinance to the Schwab API.

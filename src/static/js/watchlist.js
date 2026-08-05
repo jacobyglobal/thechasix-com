@@ -8,16 +8,18 @@
   /* Per-column display formatting (column names are the CSV headers). */
   var FMT_DATE = { Date: 1 };
   var FMT_PRICE = {
-    Open: 1, High: 1, Low: 1, Close: 1, "OHLC / 4": 1, "True Range": 1,
-    "Average True Range (ATR)": 1, "52-Wk High": 1, "52-Wk Low": 1, "52-Wk Range": 1
+    Open: 1, High: 1, Low: 1, Close: 1, "Typical Price (TP)": 1, "True Range (TR)": 1,
+    "Average True Range (ATR)": 1, "52-Week High": 1, "52-Week Low": 1, "52-Week Range Position": 1
   };
   var FMT_PCT1 = {
-    "ATR as % Price": 1, "DeMark High Low Rank": 1, "Close vs Open %": 1,
-    "Vol % of Vol EMA 21": 1, "Vol % of Vol Median 21": 1, "Relative Vol vs QQQ Market": 1
+    "Normalized ATR (NATR)": 1, "TD Range Rank": 1, "Session Return %": 1,
+    "Relative Volume (RVOL EMA)": 1, "Relative Volume (RVOL Median)": 1, "Idiosyncratic RVOL": 1,
+    "Jacoby Range Index": 1
   };
-  var FMT_VOL = { "Volume (Vol)": 1, "Vol EMA 21": 1, "Vol Median 21": 1 };
-  var FMT_INT = { "Notional Value $M": 1 };
-  var FMT_SIGN = { "Close vs Open %": 1, "Relative Vol vs QQQ Market": 1 };
+  var FMT_PCT2 = { "Jacoby Volume Profile Oscillator": 1 };
+  var FMT_VOL = { "Volume (Vol)": 1, "21-Period EMA Volume": 1, "21-Period Median Volume": 1 };
+  var FMT_INT = { "Notional Turnover ($M)": 1 };
+  var FMT_SIGN = { "Session Return %": 1, "Idiosyncratic RVOL": 1, "Jacoby Range Index": 1, "Jacoby Volume Profile Oscillator": 1 };
 
   var rows = [];
   var columns = [];
@@ -51,6 +53,7 @@
     if (FMT_DATE[col]) return fmtDate(v);
     if (FMT_PRICE[col]) return fmtNum(v, 2);
     if (FMT_PCT1[col]) return fmtNum(v, 1);
+    if (FMT_PCT2[col]) return fmtNum(v, 2);
     if (FMT_VOL[col]) return fmtCompact(v);
     if (FMT_INT[col]) return fmtNum(v, 0);
     return v === null || v === undefined ? "—" : String(v);

@@ -1,0 +1,163 @@
+{
+  "_meta": {
+    "schema": "watchlist-column-guide",
+    "version": 1,
+    "column_count": 22
+  },
+  "columns": [
+    {
+      "name": "Ticker",
+      "kind": "base",
+      "formula": "",
+      "meaning": "Symbol from the watchlist.",
+      "recompute": ""
+    },
+    {
+      "name": "Date",
+      "kind": "base",
+      "formula": "",
+      "meaning": "Trading date of the latest bar used for the row.",
+      "recompute": ""
+    },
+    {
+      "name": "Open",
+      "kind": "base",
+      "formula": "",
+      "meaning": "Raw daily open from yfinance.",
+      "recompute": ""
+    },
+    {
+      "name": "High",
+      "kind": "base",
+      "formula": "",
+      "meaning": "Raw daily high from yfinance.",
+      "recompute": ""
+    },
+    {
+      "name": "Low",
+      "kind": "base",
+      "formula": "",
+      "meaning": "Raw daily low from yfinance.",
+      "recompute": ""
+    },
+    {
+      "name": "Close",
+      "kind": "base",
+      "formula": "",
+      "meaning": "Raw daily close from yfinance.",
+      "recompute": ""
+    },
+    {
+      "name": "Volume (Vol)",
+      "kind": "base",
+      "formula": "",
+      "meaning": "Raw daily share volume (Vol = Volume); basis for all Vol ... columns.",
+      "recompute": ""
+    },
+    {
+      "name": "OHLC / 4",
+      "kind": "intermediate",
+      "formula": "(Open + High + Low + Close) / 4",
+      "meaning": "A per-bar typical-price proxy standing in for intraday VWAP throughout the watchlist (used by ATR as % Price, DeMark High Low Rank, and Notional Value $M).",
+      "recompute": ""
+    },
+    {
+      "name": "True Range",
+      "kind": "intermediate",
+      "formula": "Max(High - Low, |High - OHLC / 4|, |OHLC / 4 - Low|)",
+      "meaning": "The daily true range of the bar, measured from the OHLC / 4 proxy price instead of the close. It is the input series to Average True Range (ATR).",
+      "recompute": ""
+    },
+    {
+      "name": "Average True Range (ATR)",
+      "kind": "intermediate",
+      "formula": "EMA21(True Range)",
+      "meaning": "The 21-day average true range anchored at the OHLC / 4 proxy price - a volatility measure in dollar terms.",
+      "recompute": ""
+    },
+    {
+      "name": "ATR as % Price",
+      "kind": "computed",
+      "formula": "((OHLC / 4 + Average True Range (ATR)) / OHLC / 4) * 100",
+      "meaning": "Average True Range (ATR) expressed as a percentage of price. ATR as % Price - 100 is the ATR as a % of price; values well above 100 indicate an expanded daily range relative to price.",
+      "recompute": "(OHLC / 4 + Average True Range (ATR)) / OHLC / 4 * 100"
+    },
+    {
+      "name": "52-Wk High",
+      "kind": "intermediate",
+      "formula": "Highest(High, 252)",
+      "meaning": "The 52-week trading range boundary - the upper DeMark High/Low reference level.",
+      "recompute": ""
+    },
+    {
+      "name": "52-Wk Low",
+      "kind": "intermediate",
+      "formula": "Lowest(Low, 252)",
+      "meaning": "The 52-week trading range boundary - the lower DeMark High/Low reference level.",
+      "recompute": ""
+    },
+    {
+      "name": "52-Wk Range",
+      "kind": "intermediate",
+      "formula": "52-Wk High - 52-Wk Low",
+      "meaning": "The width of the 52-week high-low range, in dollars.",
+      "recompute": ""
+    },
+    {
+      "name": "DeMark High Low Rank",
+      "kind": "computed",
+      "formula": "((OHLC / 4 - 52-Wk Low) / 52-Wk Range) * 100 - 50   (rounded to 1 decimal)",
+      "meaning": "Where the OHLC / 4 price sits inside the 52-week high-low range, on a 0-centered scale of [-50, +50]. Above zero = upper half of the yearly range; below zero = lower half. The sentinel 65.0 is used when the range is zero (rare).",
+      "recompute": "(OHLC / 4 - 52-Wk Low) / 52-Wk Range * 100 - 50"
+    },
+    {
+      "name": "Close vs Open %",
+      "kind": "computed",
+      "formula": "log(Close / Open) * 100",
+      "meaning": "Continuously-compounded percent change from the open to the close. Positive = closed above the open; negative = closed below.",
+      "recompute": ""
+    },
+    {
+      "name": "Vol EMA 21",
+      "kind": "intermediate",
+      "formula": "EMA21(Volume)",
+      "meaning": "The 21-day exponential moving average of volume (Vol). The baseline for Vol % of Vol EMA 21.",
+      "recompute": ""
+    },
+    {
+      "name": "Vol % of Vol EMA 21",
+      "kind": "computed",
+      "formula": "Volume / Vol EMA 21 * 100   (rounded to 1 decimal)",
+      "meaning": "Current volume relative to its 21-day exponential average. 100 = average activity; >130 = heavy volume; <80 = light volume.",
+      "recompute": "Volume / Vol EMA 21 * 100"
+    },
+    {
+      "name": "Vol Median 21",
+      "kind": "intermediate",
+      "formula": "Median(Volume, 21)",
+      "meaning": "The 21-day median volume (Vol) - the baseline for the ticker side of Relative Vol vs QQQ Market.",
+      "recompute": ""
+    },
+    {
+      "name": "Vol % of Vol Median 21",
+      "kind": "computed",
+      "formula": "Volume / Vol Median 21 * 100",
+      "meaning": "The ticker's volume (Vol) as a percentage of its own 21-day median volume. 100 = median activity.",
+      "recompute": "Volume / Vol Median 21 * 100"
+    },
+    {
+      "name": "Relative Vol vs QQQ Market",
+      "kind": "computed",
+      "formula": "log(Vol % of Vol Median 21 / qqqVolPct) * 100   where qqqVolPct = QQQ row's Vol % of Vol Median 21",
+      "meaning": "The ticker's volume (Vol) normalized against the market's (QQQ's) relative volume, log-scaled. 0 = the stock's volume activity matches the market's; positive = trading on relatively higher volume than the market; negative = lighter.",
+      "recompute": "log(Vol % of Vol Median 21 / QQQ's Vol % of Vol Median 21) * 100, using the QQQ row for the denominator"
+    },
+    {
+      "name": "Notional Value $M",
+      "kind": "computed",
+      "formula": "round(Volume * OHLC / 4 / 1_000_000)",
+      "meaning": "Dollar value traded for the day in millions (volume weighted at the OHLC / 4 proxy price). A liquidity/participation measure: large, liquid names show high values. Holds the raw numeric value for easy sorting.",
+      "recompute": "Volume * OHLC / 4 / 1_000_000, rounded"
+    }
+  ]
+}

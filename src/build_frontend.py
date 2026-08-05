@@ -19,6 +19,7 @@ API_ROOT = os.getenv("API_ROOT", "https://api.thechasix.com")
 TEMPLATE_TARGETS = [
     ("index.html", "index.html"),
     ("screener.html", "screener.html"),
+    ("watchlist.html", "watchlist.html"),
     ("stock_detail.html", "stock.html"),
     ("pricing.html", "pricing.html"),
 ]

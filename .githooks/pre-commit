@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Zero-Build Netlify pre-commit hook.
+# Rebuilds dist/ whenever frontend sources (src/templates or src/static)
+# change, so a commit can never ship stale static assets to Netlify.
+# Aborts the commit if the build fails.
+set -euo pipefail
+
+changed=$( { git diff --cached --name-only; git diff --name-only; } 2>/dev/null | sort -u )
+
+if ! echo "$changed" | grep -qE '^src/(templates|static)/'; then
+  exit 0
+fi
+
+if [ -x .venv/bin/python ]; then
+  PY=.venv/bin/python
+elif command -v python3 >/dev/null 2>&1; then
+  PY=python3
+else
+  PY=python
+fi
+
+echo "Frontend sources changed — rebuilding dist/..."
+if ! "$PY" -m src.build_frontend; then
+  echo "ERROR: python -m src.build_frontend failed. Commit aborted." >&2
+  exit 1
+fi
+
+git add dist/
+echo "dist/ rebuilt and staged."

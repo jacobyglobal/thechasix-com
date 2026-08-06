@@ -24,7 +24,6 @@ ENV/
 
 # Distribution and build artifacts
 build/
-dist/
 *.egg-info/
 *.egg
 .eggs/
@@ -37,7 +36,6 @@ htmlcov/
 .nox/
 
 # Distribution builds
-dist/
 node_modules/
 
 # Runtime data

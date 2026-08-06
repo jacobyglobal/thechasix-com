@@ -2,17 +2,23 @@
 
 Renders the Jinja2 templates (src/templates/) to static HTML in `dist/`
 for deployment on Netlify, and copies static assets (css/js).
+
+This script must stay isolated from the backend: it may only use the Python
+standard library and `jinja2`. It must NOT import src.config or any heavy
+backend package (pandas, fastapi, database drivers, etc.), so the pre-built
+`dist/` output remains reproducible with only `requirements-frontend.txt`.
 """
 
 import os
-import sys
 from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from src.config import DIST_DIR, STATIC_DIR, TEMPLATE_DIR
+_SRC_DIR = Path(__file__).resolve().parent
+_PROJECT_ROOT = _SRC_DIR.parent
+DIST_DIR = _PROJECT_ROOT / "dist"
+STATIC_DIR = _SRC_DIR / "static"
+TEMPLATE_DIR = _SRC_DIR / "templates"
 
 API_ROOT = os.getenv("API_ROOT", "https://api.thechasix.com")
 

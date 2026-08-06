@@ -39,14 +39,18 @@ account credit usage exceeded" error again, while keeping the Render backend
 - Frontend sources that must be rebuilt before pushing:
   - `src/templates/*` (Jinja2 templates)
   - `src/static/css/*` and `src/static/js/*`
-- Rebuild command: `python -m src.build_frontend` (requires only `jinja2`).
+- Rebuild command: `python -m src.build_frontend` (requires only `jinja2`,
+  from `requirements-frontend.txt`).
 - A versioned **pre-commit hook** (`.githooks/pre-commit`) rebuilds `dist/`
   automatically whenever those sources change, so a stale `dist/` can never be
   committed.
 
 ### Rule 2: Isolated Backend on Render
-- The root `requirements.txt` stays untouched so Render's Python service keeps
-  installing all backend dependencies (fastapi, pandas, etc.).
+- Backend dependencies live in **`requirements-backend.txt`** (not a root
+  `requirements.txt` — a root `requirements.txt` would make Netlify auto-install
+  the entire backend stack on every deploy and burn build minutes).
+- `render.yaml` and the nightly GitHub Actions workflow explicitly install
+  `requirements-backend.txt`.
 - All heavy computation, database access, and external API calls live on Render.
 - **Never** add heavy packages (pandas, yfinance, DB drivers, etc.) to the
   frontend build path or to any file Netlify scans.
@@ -64,6 +68,9 @@ account credit usage exceeded" error again, while keeping the Render backend
 | `.gitignore` | Remove both `dist/` entries so Git tracks the pre-built site. |
 | `dist/` | Now committed to Git (all rendered pages + copied assets). |
 | `.githooks/pre-commit` | New versioned hook: rebuilds `dist/` when `src/templates/` or `src/static/` change, aborts commit if the build fails. |
+| `requirements.txt` | Renamed to `requirements-backend.txt` so Netlify's build image never auto-installs the backend stack. |
+| `requirements-frontend.txt` | New: `jinja2` only, for local `dist/` rebuilds. |
+| `src/build_frontend.py` | No longer imports `src.config`; paths defined locally so the build needs only stdlib + `jinja2`. |
 | `AGENTS.md` | Documents the Zero-Build rule and mandatory rebuild-before-commit workflow. |
 | `Plan_WebArchitecture.md` | This document. |
 

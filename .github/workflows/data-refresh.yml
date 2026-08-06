@@ -16,7 +16,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
+          pip install -r requirements-backend.txt
 
       - name: Refresh stock data from Schwab API
         env:

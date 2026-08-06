@@ -1,0 +1,4 @@
+# Frontend build dependencies (LOCAL only — used by python -m src.build_frontend).
+# Netlify never installs these; the site is pre-built and committed as dist/.
+# This file deliberately contains only the ultra-light template engine.
+jinja2>=3.1

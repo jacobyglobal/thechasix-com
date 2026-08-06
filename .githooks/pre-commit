@@ -22,6 +22,7 @@ fi
 echo "Frontend sources changed — rebuilding dist/..."
 if ! "$PY" -m src.build_frontend; then
   echo "ERROR: python -m src.build_frontend failed. Commit aborted." >&2
+  echo "Hint: install jinja2 first — pip install -r requirements-frontend.txt" >&2
   exit 1
 fi
 

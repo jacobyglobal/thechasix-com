@@ -324,7 +324,8 @@
     var neg = 0;
     for (var j = 0; j < PNL_NEG.length; j++) if (n.indexOf(PNL_NEG[j]) !== -1) neg++;
     if (pos === 0 && neg > 0) return -10;
-    return pos * 6 - neg * 2;
+    var gainLossBonus = n.indexOf("gain") !== -1 && n.indexOf("loss") !== -1 ? 4 : 0;
+    return pos * 6 - neg * 2 + gainLossBonus;
   }
 
   function scoreDate(name) {
@@ -387,6 +388,19 @@
     return best;
   }
 
+  function looksLikeHeader(row) {
+    var nonEmpty = 0;
+    for (var i = 0; i < row.length; i++) if (String(row[i]).trim()) nonEmpty++;
+    if (nonEmpty < 2) return false;
+    var pnl = false, date = false, ticker = false;
+    for (var j = 0; j < row.length; j++) {
+      if (scorePnL(row[j]) >= 6) pnl = true;
+      if (scoreDate(row[j]) >= 6) date = true;
+      if (scoreTicker(row[j]) >= 6) ticker = true;
+    }
+    return (pnl ? 1 : 0) + (date ? 1 : 0) + (ticker ? 1 : 0) >= 2;
+  }
+
   function parseCsv(text) {
     var delim = detectDelimiter(text);
     var rows = [];
@@ -395,7 +409,12 @@
       rows.push(splitCsvLine(line.trim(), delim));
     });
     if (rows.length < 2) return null;
-    return { headers: rows[0], data: rows.slice(1) };
+    var hi = 0;
+    var limit = Math.min(rows.length, 8);
+    for (var i = 0; i < limit; i++) {
+      if (looksLikeHeader(rows[i])) { hi = i; break; }
+    }
+    return { headers: rows[hi], data: rows.slice(hi + 1) };
   }
 
   function detectColumns(headers, data) {

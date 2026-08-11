@@ -12,6 +12,8 @@
   --radius: 10px;
 }
 
+.tinted { color: var(--accent); }
+
 * { box-sizing: border-box; }
 
 html, body {
@@ -367,3 +369,189 @@ main.container { padding-top: 32px; padding-bottom: 64px; }
   color: var(--muted);
   font-size: 0.9rem;
 }
+
+/* Calculator */
+.privacy-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent-soft);
+  border: 1px solid var(--accent);
+  color: var(--accent-hover);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+}
+.privacy-badge strong { color: #fff; }
+.input-groups { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+@media (max-width: 720px) { .input-groups { grid-template-columns: 1fr; } }
+@media (max-width: 640px) { .ror-grid { grid-template-columns: 1fr; } }
+.input-group {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+.input-group h3 { margin: 0 0 2px; font-size: 1rem; }
+.group-hint { margin: 0 0 16px; font-size: 0.85rem; }
+.calc-form { display: flex; flex-direction: column; gap: 16px; margin: 0; }
+.calc-field { display: flex; flex-direction: column; gap: 6px; }
+.calc-field label { color: var(--muted); font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.calc-field input[type="number"] {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  width: 100%;
+}
+.calc-field input[type="number"]:focus { outline: none; border-color: var(--accent); }
+.range-field { display: flex; align-items: center; gap: 10px; }
+.range-field input[type="range"] { flex: 1; accent-color: var(--accent); }
+.range-field input[type="number"] { flex: 0 0 68px; }
+.range-field .unit { color: var(--muted); font-size: 0.9rem; flex: 0 0 auto; }
+.money-field {
+  display: flex;
+  align-items: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.money-field:focus-within { border-color: var(--accent); }
+.money-field .prefix { padding-left: 12px; color: var(--muted); font-weight: 600; }
+.money-field input[type="number"] {
+  border: none;
+  background: transparent;
+  flex: 1;
+  min-width: 0;
+  padding-left: 6px;
+}
+.money-field input[type="number"]:focus { outline: none; border-color: transparent; }
+.field-hint { font-size: 0.78rem; color: var(--muted); margin: -2px 0 0; }
+.link-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--accent-hover);
+  cursor: pointer;
+  text-decoration: underline;
+}
+.link-btn:hover { color: var(--text); }
+
+.expectancy-display { text-align: center; padding: 18px 0 22px; }
+.expectancy-value { font-size: 3rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+.expectancy-r { margin-top: 6px; color: var(--muted); font-size: 0.95rem; }
+
+.composite-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+.stat-card { background: var(--bg-elev); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
+.stat-label { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+.stat-value { font-size: 1.35rem; font-weight: 700; margin: 6px 0 2px; }
+.stat-sub { color: var(--muted); font-size: 0.8rem; }
+
+.ror-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.ror-card {
+  text-align: center;
+  padding: 18px 16px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+.ror-card h3 { margin: 0 0 10px; font-size: 1.05rem; }
+.ror-value { font-size: 2.6rem; font-weight: 800; }
+.ror-interp { margin-top: 8px; color: var(--muted); font-size: 0.95rem; }
+.ror-survive { margin-top: 6px; color: var(--muted); font-size: 0.9rem; }
+.ror-survive[hidden] { display: none; }
+
+.risk-meter { margin: 16px auto 0; max-width: 460px; }
+.risk-meter[hidden] { display: none; }
+.risk-meter-track {
+  position: relative;
+  display: flex;
+  height: 12px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--border);
+  border: 1px solid var(--border);
+}
+.risk-marker {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 4px;
+  background: #fff;
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+  transform: translateX(-50%);
+}
+.risk-scale {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 0.7rem;
+  margin-top: 5px;
+}
+
+.streak-vis-wrap { margin-top: 16px; }
+.streak-vis-wrap[hidden] { display: none; }
+.streak-head { margin: 0 0 8px; font-size: 0.92rem; }
+.decline-strip {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2px;
+  height: 110px;
+  padding: 4px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+.decline-bar {
+  flex: 1;
+  min-width: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--accent);
+  transition: height 0.2s;
+}
+.streak-caption { font-size: 0.85rem; text-align: center; margin: 8px 0 0; }
+
+.csv-drop {
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+  padding: 26px 18px;
+  text-align: center;
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.csv-drop:hover, .csv-drop.dragover { border-color: var(--accent); background: var(--accent-soft); }
+.csv-drop p { margin: 0 0 4px; }
+.csv-confirm {
+  margin-top: 12px;
+  color: var(--text);
+  font-size: 0.92rem;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+}
+.csv-confirm[hidden] { display: none; }
+.column-picker { margin-top: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.column-picker[hidden] { display: none; }
+.column-picker label { color: var(--muted); font-size: 0.9rem; }
+.column-picker select {
+  background: var(--bg-elev);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+.column-picker select:focus { outline: none; border-color: var(--accent); }
+#trades-card { margin-top: 24px; }
+

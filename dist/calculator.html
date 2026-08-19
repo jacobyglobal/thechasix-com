@@ -19,7 +19,13 @@
       <a class="brand" href="/">The<span class="accent">ChasIX</span></a>
       <ul class="nav-links">
         <li><a href="/screener.html">Screener</a></li>
-        <li><a href="/watchlist.html">Stock Watchlist</a></li>
+        <li class="nav-drop">
+          <button type="button" class="nav-drop-btn" aria-haspopup="true" aria-expanded="false">Stocks <span class="caret">▾</span></button>
+          <ul class="nav-drop-menu">
+            <li><a href="/watchlist.html">Stock Watchlist</a></li>
+            <li><a href="/news.html">News</a></li>
+          </ul>
+        </li>
         <li><a href="/stock.html?ticker=SPY">ETF Detail</a></li>
         <li><a href="/calculator.html">Trading Edge</a></li>
         <li><a href="/pricing.html">Pricing</a></li>
@@ -198,7 +204,7 @@
       </div>
     </div>
   </div>
-  <p class="muted" style="font-size:0.8rem;margin-top:14px;">Gambler's Ruin estimates your long-run probability of ruin from your per-trade edge (win rate &times; reward vs loss) and account size. Streak Risk estimates the chance a single losing streak at your risk-per-trade wipes out the account — smaller risk per trade means you can survive longer streaks.</p>
+  <p class="muted" style="font-size:0.8rem;margin-top:14px;">Gambler's Ruin estimates your long-run probability of ruin from your per-trade edge (win rate &times; reward vs loss) and your risk per trade — smaller risk per trade means the account can absorb more losing trades. Streak Risk estimates the chance a single losing streak at your risk-per-trade wipes out the account.</p>
 </section>
 
 <section class="card" id="trades-card" hidden>
@@ -234,7 +240,7 @@
   </script>
   <script src="/js/main.js" defer></script>
   
-<script src="/js/calculator.js" defer></script>
+<script src="/js/calculator.js?v=2" defer></script>
 
 </body>
 </html>

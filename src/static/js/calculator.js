@@ -279,12 +279,14 @@
 
     if (avgLoss <= 0) {
       paintRorCard(el.rorGamblerValue, el.rorGamblerInterp, el.riskMeterGambler, el.riskMarkerGambler, null, "Enter Average Loss.");
-    } else if (account <= 0 || p <= 0 || avgWin <= 0) {
-      paintRorCard(el.rorGamblerValue, el.rorGamblerInterp, el.riskMeterGambler, el.riskMarkerGambler, null, "Enter Win %, Average Win, Average Loss and Account Size.");
+    } else if (risk <= 0) {
+      paintRorCard(el.rorGamblerValue, el.rorGamblerInterp, el.riskMeterGambler, el.riskMarkerGambler, null, "Enter Risk per Trade.");
+    } else if (p <= 0 || avgWin <= 0) {
+      paintRorCard(el.rorGamblerValue, el.rorGamblerInterp, el.riskMeterGambler, el.riskMarkerGambler, null, "Enter Win %, Average Win and Average Loss.");
     } else {
       var winR = avgWin / avgLoss;
       var eR = p * winR - (1 - p);
-      var ror = eR <= 0 ? 100 : gamblersRuinRor(eR, winR, p, account / avgLoss);
+      var ror = eR <= 0 ? 100 : gamblersRuinRor(eR, winR, p, 100 / risk);
       var interp = ror < 1 ? "Ruin probability below 1%." : ror <= 20 ? "Ruin probability between 1% and 20%." : "Ruin probability above 20%.";
       paintRorCard(el.rorGamblerValue, el.rorGamblerInterp, el.riskMeterGambler, el.riskMarkerGambler, ror, interp);
     }

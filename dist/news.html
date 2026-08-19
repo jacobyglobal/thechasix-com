@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ETF Detail — The ChasIX</title>
-  <meta name="description" content="Financial intelligence: ETF market highs, sector breadth, and market data." />
+  <title>Stock News Ranking — The ChasIX</title>
+  <meta name="description" content="Daily ranked market news: sentiment-scored headlines (VADER) correlated with price signals (relative volume + log return)." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -36,40 +36,25 @@
   <main class="container">
     
 <section class="page-head">
-  <h1><span id="detail-ticker">SPY</span> <small class="muted" id="detail-sector"></small></h1>
+  <h1>Stock News Ranking</h1>
+  <p class="muted">Headlines for the watchlist, ranked by signal strength — VADER sentiment combined with relative volume and log return. Strongest signals first.</p>
 </section>
 
-<div id="detail-error" class="alert" hidden></div>
+<div class="screener-controls">
+  <input type="text" id="filter-ticker" placeholder="Filter ticker…" />
+  <select id="filter-sentiment" aria-label="Sentiment">
+    <option value="">All sentiment</option>
+    <option value="positive">Positive</option>
+    <option value="negative">Negative</option>
+    <option value="neutral">Neutral</option>
+  </select>
+  <button class="btn btn-outline" id="btn-reset">Reset</button>
+</div>
+<p class="muted" id="news-status"></p>
 
-<section class="detail-grid">
-  <div class="card" data-profile>
-    <h2>Market High / Low Profile</h2>
-    <table class="table" id="profile-table">
-      <thead>
-        <tr>
-          <th>Duration</th>
-          <th>Days</th>
-          <th>Period High</th>
-          <th>% Off High</th>
-          <th>% Off Low</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-  <div class="card">
-    <h2>Similar ETFs / Market Profiles</h2>
-    <ul class="similar-list" id="similar-list"></ul>
-  </div>
-</section>
-
-<section class="card">
-  <div class="chart-head">
-    <h2>Price History (10-Year Daily)</h2>
-    <div class="chart-periods" id="chart-periods"></div>
-  </div>
-  <div class="chart-wrap"><canvas id="price-chart"></canvas></div>
-</section>
+<div class="news-list" id="news-list">
+  <p class="muted">Loading news…</p>
+</div>
 
   </main>
 
@@ -84,13 +69,7 @@
   </script>
   <script src="/js/main.js" defer></script>
   
-<script>
-  document.addEventListener("DOMContentLoaded", function () {
-    var params = new URLSearchParams(window.location.search);
-    var ticker = params.get("ticker") || "SPY";
-    loadDetail(ticker);
-  });
-</script>
+<script src="/js/news.js" defer></script>
 
 </body>
 </html>

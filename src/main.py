@@ -19,6 +19,7 @@ from src.api.recommendations import router as recs_router
 from src.api.auth import router as auth_router
 from src.api.payments import router as payments_router
 from src.api.watchlist import router as watchlist_router
+from src.api.news import router as news_router
 from src.core.cache import init_db
 from src.core.schwab_client import schwab_client
 
@@ -74,6 +75,7 @@ app.include_router(recs_router, prefix="/api/stocks", tags=["recommendations"])
 app.include_router(auth_router, prefix="/api/auth", tags=["auth"])
 app.include_router(payments_router, prefix="/api/payments", tags=["payments"])
 app.include_router(watchlist_router, prefix="/api/watchlist", tags=["watchlist"])
+app.include_router(news_router, prefix="/api/news", tags=["news"])
 
 
 @app.get("/")

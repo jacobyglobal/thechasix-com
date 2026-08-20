@@ -9,7 +9,19 @@ import json
 import hashlib
 from datetime import datetime, timedelta
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from sqlalchemy import Column, String, Text, DateTime, select, delete
+from sqlalchemy import (
+    BigInteger,
+    Boolean,
+    Column,
+    DateTime,
+    Float,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    select,
+    delete,
+)
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 from src.config import DATABASE_URL, CACHE_TTL_DEFAULT, CACHE_TTL_FUNDAMENTALS, CACHE_TTL_PRICE_HISTORY
@@ -44,6 +56,47 @@ class CacheEntry(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     expires_at = Column(DateTime, default=datetime.utcnow)
     data_type = Column(String(50))
+
+
+class NewsArticleRow(Base):
+    """Ranked news article written by the NewsRanking pipeline.
+
+    Mirrors NewsRanking/src/repository/models.py. Lives here so TheChasIX.com
+    can read the shared DB (Neon prod / SQLite dev) on the same Base.
+    """
+
+    __tablename__ = "news_articles"
+
+    id = Column(BigInteger().with_variant(Integer, "sqlite"), primary_key=True, autoincrement=True)
+    ticker = Column(String(16), nullable=False, index=True)
+    title = Column(Text, nullable=False)
+    summary = Column(Text, default="")
+    source = Column(String(255), default="")
+    news_url = Column(Text, nullable=False)
+    published_at = Column(DateTime, index=True)
+    fetched_at = Column(DateTime, default=datetime.utcnow)
+
+    vader_compound = Column(Float)
+    sentiment_label = Column(String(16))
+    av_sentiment_score = Column(Float)
+    av_sentiment_label = Column(String(16))
+
+    rvol = Column(Float)
+    log_return = Column(Float)
+    base_price = Column(Float)
+    target_price = Column(Float)
+    volume = Column(BigInteger)
+
+    signal_strength = Column(Float)
+    rank = Column(Integer)
+    is_filtered = Column(Boolean, default=False)
+    recency = Column(Float)
+    source_weight = Column(Float)
+    nearest_inflection_at = Column(DateTime)
+
+    __table_args__ = (
+        UniqueConstraint("ticker", "news_url", name="uq_news_ticker_url"),
+    )
 
 
 engine = create_async_engine(_async_url(DATABASE_URL))

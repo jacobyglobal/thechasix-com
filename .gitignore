@@ -60,3 +60,9 @@ backlog.csv
 # QA scratch output
 QA/
 
+
+# Local planning & scratch docs (news ranker)
+plan_newsRnk.md
+scrum-meeting-guide.md
+completed.csv
+dev-news.sh

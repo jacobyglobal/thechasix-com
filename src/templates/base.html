@@ -19,7 +19,13 @@
       <a class="brand" href="/">The<span class="accent">ChasIX</span></a>
       <ul class="nav-links">
         <li><a href="/screener.html">Screener</a></li>
-        <li><a href="/watchlist.html">Stock Watchlist</a></li>
+        <li class="nav-drop">
+          <button type="button" class="nav-drop-btn" aria-haspopup="true" aria-expanded="false">Stocks <span class="caret">▾</span></button>
+          <ul class="nav-drop-menu">
+            <li><a href="/watchlist.html">Stock Watchlist</a></li>
+            <li><a href="/news.html">News</a></li>
+          </ul>
+        </li>
         <li><a href="/stock.html?ticker=SPY">ETF Detail</a></li>
         <li><a href="/calculator.html">Trading Edge</a></li>
         <li><a href="/pricing.html">Pricing</a></li>

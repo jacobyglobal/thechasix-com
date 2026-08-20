@@ -47,6 +47,61 @@ a:hover { color: var(--accent-hover); }
 .nav-links a { color: var(--muted); font-weight: 500; }
 .nav-links a:hover { color: var(--text); }
 
+/* Nav dropdown (Stocks menu) */
+.nav-drop { position: relative; }
+.nav-drop-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--muted);
+  font-weight: 500;
+  cursor: pointer;
+}
+.nav-drop-btn:hover, .nav-drop.open .nav-drop-btn { color: var(--text); }
+.nav-drop-btn .caret { font-size: 0.85em; margin-left: 2px; }
+.nav-drop-menu {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 190px;
+  margin: 12px 0 0;
+  padding: 8px;
+  list-style: none;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  display: none;
+  z-index: 60;
+}
+/* The ::before bridge keeps the dropdown open while the pointer travels
+   from the button down into the menu (covers the 12px margin gap). */
+.nav-drop::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 12px;
+}
+.nav-drop:hover .nav-drop-menu,
+.nav-drop.open .nav-drop-menu { display: block; }
+.nav-drop-menu a {
+  display: block;
+  padding: 9px 12px;
+  border-radius: 6px;
+  color: var(--text);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.nav-drop-menu a:hover { background: var(--border); color: var(--accent-hover); }
+@media (max-width: 760px) {
+  .nav-links { gap: 14px; }
+  .nav-drop-menu { left: auto; right: 0; transform: none; }
+}
+
 main.container { padding-top: 32px; padding-bottom: 64px; }
 
 /* Hero */
@@ -554,4 +609,18 @@ main.container { padding-top: 32px; padding-bottom: 64px; }
 }
 .column-picker select:focus { outline: none; border-color: var(--accent); }
 #trades-card { margin-top: 24px; }
+
+/* News ranking */
+.desc-link {
+  display: inline-block;
+  margin-left: 4px;
+  color: var(--accent);
+  font-size: 0.8em;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: help;
+}
+.desc-link:hover { color: var(--accent-hover); }
+#news-table td.left { text-align: left; max-width: 420px; white-space: normal; }
+#news-table td.left a { font-weight: 500; }
 

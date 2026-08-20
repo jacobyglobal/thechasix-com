@@ -26,6 +26,7 @@ TEMPLATE_TARGETS = [
     ("index.html", "index.html"),
     ("screener.html", "screener.html"),
     ("watchlist.html", "watchlist.html"),
+    ("news.html", "news.html"),
     ("stock_detail.html", "stock.html"),
     ("calculator.html", "calculator.html"),
     ("pricing.html", "pricing.html"),

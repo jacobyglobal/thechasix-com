@@ -375,7 +375,27 @@
     });
   }
 
+  function initNavDropdowns() {
+    document.querySelectorAll(".nav-drop").forEach(function (wrap) {
+      var btn = wrap.querySelector(".nav-drop-btn");
+      if (!btn) return;
+      btn.addEventListener("click", function (e) {
+        e.stopPropagation();
+        var open = wrap.classList.toggle("open");
+        btn.setAttribute("aria-expanded", open ? "true" : "false");
+      });
+    });
+    document.addEventListener("click", function () {
+      document.querySelectorAll(".nav-drop.open").forEach(function (wrap) {
+        wrap.classList.remove("open");
+        var b = wrap.querySelector(".nav-drop-btn");
+        if (b) b.setAttribute("aria-expanded", "false");
+      });
+    });
+  }
+
   function init() {
+    initNavDropdowns();
     if (document.querySelector("[data-breadth]")) loadBreadth();
     if (document.querySelector("[data-leaderboard]")) loadLeaderboard();
 

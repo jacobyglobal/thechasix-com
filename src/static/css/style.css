@@ -621,6 +621,7 @@ main.container { padding-top: 32px; padding-bottom: 64px; }
   cursor: help;
 }
 .desc-link:hover { color: var(--accent-hover); }
+.cat-badge { color: #16a34a; font-size: 0.85em; cursor: help; }
 #news-table td.left { text-align: left; max-width: 420px; white-space: normal; }
 #news-table td.left a { font-weight: 500; }
 

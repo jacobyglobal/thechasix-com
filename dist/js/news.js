@@ -18,6 +18,13 @@
 
   var GUIDE = [
     {
+      name: "Catalyst Day",
+      kind: "computed",
+      formula: "The ticker actually moved intraday: RVOL >= 2.0 OR |Ch%| >= 2%. If blank, the stock was quiet that day — so the headlines are low-signal context, not a catalyst hunt.",
+      meaning: "Only on days a stock spikes in volume/price is there a catalyst to find. Silence here = expect noise, not a miss.",
+      recompute: "catalyst = (rvol >= 2.0) || (abs(exp(log_return) - 1) >= 0.02).",
+    },
+    {
       name: "Date",
       kind: "raw",
       formula: "Publication timestamp as returned by the news API.",
@@ -192,6 +199,7 @@
       tr.innerHTML =
         "<td>" + fmtDate(a.published_at) + "</td>" +
         "<td><a href='/stock.html?ticker=" + esc(a.ticker) + "'>" + esc(a.ticker) + "</a></td>" +
+        "<td>" + (a.catalyst ? "<span class='cat-badge' title='Ticker moved intraday (RVOL ≥ 2 or |Ch%| ≥ 2). Catalyst likely.'>&#9679;</span>" : "") + "</td>" +
         "<td class='left'>" +
           (a.url ? '<a href="' + esc(a.url) + '" target="_blank" rel="noopener">' + esc(a.title) + "</a>" : esc(a.title)) +
         "</td>" +
@@ -209,7 +217,7 @@
     });
 
     if (!rows.length && articles.length) {
-      tbody.innerHTML = "<tr><td colspan='13' class='muted'>No headlines match the current filters.</td></tr>";
+      tbody.innerHTML = "<tr><td colspan='14' class='muted'>No headlines match the current filters.</td></tr>";
     }
 
     updatePagination(pages, total);
@@ -308,9 +316,13 @@
     item.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
+  var topN = 0;
+
   function load() {
     var status = document.getElementById("news-status");
-    fetch(API_ROOT + "/api/news?limit=2000")
+    var q = "limit=2000";
+    if (topN > 0) q += "&top_n_per_ticker=" + topN;
+    fetch(API_ROOT + "/api/news?" + q)
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(function (data) {
         articles = data.items || [];
@@ -319,7 +331,7 @@
       .catch(function (err) {
         if (status) status.textContent = "News unavailable right now (" + err.message + ").";
         var tbody = document.querySelector("#news-table tbody");
-        if (tbody) tbody.innerHTML = "<tr><td colspan='13' class='muted'>Could not load news.</td></tr>";
+        if (tbody) tbody.innerHTML = "<tr><td colspan='14' class='muted'>Could not load news.</td></tr>";
       });
   }
 
@@ -371,6 +383,13 @@
     }
 
     var toggle = document.getElementById("btn-guide-toggle");
+    var topnBtn = document.getElementById("btn-topn");
+    if (topnBtn) topnBtn.addEventListener("click", function () {
+      topN = topN === 0 ? 3 : 0;
+      topnBtn.textContent = "Top 3 / ticker: " + (topN === 0 ? "OFF" : "ON");
+      page = 1;
+      load();
+    });
     if (toggle) toggle.addEventListener("click", function () {
       var panel = document.getElementById("guide-panel");
       if (panel.hidden) {

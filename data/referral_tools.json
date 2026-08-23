@@ -1,0 +1,38 @@
+[
+  {
+    "id": "tradingview",
+    "name": "TradingView",
+    "category": "Charting & Technical Analysis",
+    "description": "Industry-standard charting platform with real-time market data, custom Pine Script indicators, and active trading community.",
+    "url": "https://www.tradingview.com/?aff_id=thechasix",
+    "featured": true,
+    "badge": "Recommended"
+  },
+  {
+    "id": "trendspider",
+    "name": "TrendSpider",
+    "category": "Automated Technical Analysis",
+    "description": "Automated charting, strategy backtesting, multi-timeframe analysis, and dynamic price alerts for technical traders.",
+    "url": "https://trendspider.com/?_from=thechasix",
+    "featured": true,
+    "badge": "Automated Analysis"
+  },
+  {
+    "id": "finviz",
+    "name": "Finviz",
+    "category": "Stock Screener & Visualization",
+    "description": "Instant stock screening, visual sector heatmaps, insider trading feeds, and portfolio performance tracking.",
+    "url": "https://finviz.com/?a=thechasix",
+    "featured": true,
+    "badge": "Screener"
+  },
+  {
+    "id": "schwab",
+    "name": "Charles Schwab",
+    "category": "Brokerage & Trading Platform",
+    "description": "Zero-commission stock, ETF, and options trading with thinkorswim professional desktop workstation.",
+    "url": "https://www.schwab.com/client-referral?refr=thechasix",
+    "featured": false,
+    "badge": "Brokerage"
+  }
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "id": "market-wizards",
+    "name": "Market Wizards",
+    "author": "Jack D. Schwager",
+    "category": "Trading Psychology & Strategy",
+    "description": "Interviews with top traders disclosing their risk management rules, mindsets, and trading strategies.",
+    "url": "https://www.amazon.com/dp/0060158852?tag=thechasix-20",
+    "featured": true,
+    "badge": "Must Read"
+  },
+  {
+    "id": "reminiscences",
+    "name": "Reminiscences of a Stock Operator",
+    "author": "Edwin Lefèvre",
+    "category": "Trading Classics",
+    "description": "The timeless fictionalized biography of Jesse Livermore and the psychology of speculative trading.",
+    "url": "https://www.amazon.com/dp/0471770884?tag=thechasix-20",
+    "featured": true,
+    "badge": "Classic"
+  },
+  {
+    "id": "trading-in-the-zone",
+    "name": "Trading in the Zone",
+    "author": "Mark Douglas",
+    "category": "Psychology",
+    "description": "Mastering the mental game of trading, probability mindsets, and emotional discipline.",
+    "url": "https://www.amazon.com/dp/0735201447?tag=thechasix-20",
+    "featured": true,
+    "badge": "Psychology"
+  },
+  {
+    "id": "quant-trading",
+    "name": "Quantitative Trading",
+    "author": "Ernie Chan",
+    "category": "Algorithmic Trading",
+    "description": "A practical guide to building and backtesting automated algorithmic trading strategies.",
+    "url": "https://www.amazon.com/dp/1119800063?tag=thechasix-20",
+    "featured": false,
+    "badge": "Quant"
+  }
+]

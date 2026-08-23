@@ -4,6 +4,7 @@ Avoids hitting Schwab rate limits (120 req/min).
 TTL-based invalidation. Matches the data_vault pattern from SchwabAPI project.
 """
 
+import asyncio
 import logging
 import json
 import hashlib
@@ -39,10 +40,12 @@ def _async_url(url: str) -> str:
     """
     if url.startswith("sqlite"):
         return url.replace("sqlite://", "sqlite+aiosqlite://", 1)
-    if url.startswith("postgresql://"):
-        return url.replace("postgresql://", "postgresql+asyncpg://", 1)
-    if url.startswith("postgres://"):
-        return url.replace("postgres://", "postgresql+asyncpg://", 1)
+    if url.startswith(("postgresql://", "postgres://")):
+        async_url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        async_url = async_url.replace("postgres://", "postgresql+asyncpg://", 1)
+        # asyncpg does not accept the ?sslmode=require query param; strip it.
+        # (Same workaround as NewsRanking/src/repository/neon_repository.py.)
+        return async_url.split("?", 1)[0]
     return url
 
 
@@ -99,7 +102,7 @@ class NewsArticleRow(Base):
     )
 
 
-engine = create_async_engine(_async_url(DATABASE_URL))
+engine = create_async_engine(_async_url(DATABASE_URL), pool_pre_ping=True)
 AsyncSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 
@@ -109,11 +112,30 @@ def make_cache_key(endpoint: str, params: dict) -> str:
     return f"{endpoint}:{hashlib.md5(param_str.encode()).hexdigest()}"
 
 
+# Neon suspends after ~5 min of inactivity; give the DB time to wake.
+NEON_RETRY_DELAYS = (2, 5, 10)
+
+
 async def init_db():
-    """Create tables on startup."""
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    logger.info("Database tables initialized.")
+    """Create tables on startup (with cold-start retry + backoff for Neon)."""
+    last_exc: Exception | None = None
+    for attempt, delay in enumerate((0,) + NEON_RETRY_DELAYS):
+        if attempt:
+            logger.warning(
+                "Neon cold-start attempt %d failed, retrying in %ss: %s",
+                attempt,
+                delay,
+                last_exc,
+            )
+            await asyncio.sleep(delay)
+        try:
+            async with engine.begin() as conn:
+                await conn.run_sync(Base.metadata.create_all)
+            logger.info("Database tables initialized.")
+            return
+        except Exception as exc:
+            last_exc = exc
+    raise RuntimeError(f"Database initialization failed after retries: {last_exc}")
 
 
 async def get_cached(key: str, ttl: int = None) -> dict | None:

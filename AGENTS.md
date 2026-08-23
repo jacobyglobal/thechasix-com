@@ -18,3 +18,10 @@
 ## 3. Code Organization
 - Frontend layout templates and static assets go in `src/templates/` and `src/static/`; compiled output goes to `dist/` (committed).
 - Backend API endpoints, data processing, and external API requests must be routed through the Render backend code structure.
+
+## 4. Architecture Review Gate
+- Before starting any feature that adds new pages/templates (`src/templates/*`) or API endpoints (`src/api/*`), run:
+  `.venv/bin/python .opencode/skill/arch-review/run.py "<Feature Name>"`
+- It auto-injects the current rules from this file and `Plan_WebArchitecture.md` into a compliance checklist and writes `.opencode/reviews/DESIGN_REVIEW_<date>_<slug>.md` (git-ignored, all retained).
+- The pre-commit hook prints a non-blocking warning when new template/API files are committed with no review on file.
+- Full workflow, patterns, and anti-patterns: see **`ARCH_REVIEW_GUIDE.md`**.

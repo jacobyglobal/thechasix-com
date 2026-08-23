@@ -60,6 +60,9 @@ backlog.csv
 # QA scratch output
 QA/
 
+# Architecture review artifacts (local, git-ignored; all retained on disk)
+.opencode/reviews/
+
 
 # Local planning & scratch docs (news ranker)
 plan_newsRnk.md

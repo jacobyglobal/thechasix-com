@@ -7,6 +7,23 @@ set -euo pipefail
 
 changed=$( { git diff --cached --name-only; git diff --name-only; } 2>/dev/null | sort -u )
 
+# Architecture review gate (advisory only — never blocks).
+# Warns when NEW template or API files are committed without any
+# DESIGN_REVIEW_*.md on file. See ARCH_REVIEW_GUIDE.md.
+new_frontend_or_api=$(echo "$changed" | grep -E '^src/(templates|api)/' || true)
+if [ -n "$new_frontend_or_api" ]; then
+  has_new_files=$(git diff --cached --name-only --diff-filter=A -- 'src/templates/*.html' 'src/api/*.py' 2>/dev/null || true)
+  if [ -n "$has_new_files" ]; then
+    review_count=$(ls .opencode/reviews/DESIGN_REVIEW_*.md 2>/dev/null | wc -l | tr -d ' ' || echo 0)
+    if [ "${review_count:-0}" -eq 0 ]; then
+      echo "WARNING: New template/API file(s) staged without an architecture review:" >&2
+      echo "$has_new_files" | sed 's/^/  - /' >&2
+      echo "Run: .venv/bin/python .opencode/skill/arch-review/run.py \"<Feature Name>\"" >&2
+      echo "(Non-blocking — commit will proceed. See ARCH_REVIEW_GUIDE.md.)" >&2
+    fi
+  fi
+fi
+
 if ! echo "$changed" | grep -qE '^src/(templates|static)/'; then
   exit 0
 fi

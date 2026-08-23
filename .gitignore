@@ -49,6 +49,7 @@ data/logs/
 *.db-journal
 
 # Local planning & agent configuration files
+AGENTS.md
 gemini.md
 plan.md
 plan.human.md
@@ -60,8 +61,9 @@ backlog.csv
 # QA scratch output
 QA/
 
-# Architecture review artifacts (local, git-ignored; all retained on disk)
-.opencode/reviews/
+# Agent configuration & architecture review artifacts (local, git-ignored;
+# all retained on disk)
+.opencode/
 
 
 # Local planning & scratch docs (news ranker)

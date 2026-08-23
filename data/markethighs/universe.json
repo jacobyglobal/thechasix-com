@@ -1,0 +1,238 @@
+{
+  "as_of": "2026-08-21",
+  "generated_at": "2026-08-22T21:13:24",
+  "ticker_count": 46,
+  "profiled_count": 46,
+  "tickers": [
+    {
+      "symbol": "QQQ",
+      "sector": "Benchmark",
+      "profile_computed": true
+    },
+    {
+      "symbol": "MU",
+      "sector": "Semiconductors",
+      "profile_computed": true
+    },
+    {
+      "symbol": "MSFT",
+      "sector": "Software",
+      "profile_computed": true
+    },
+    {
+      "symbol": "NVDA",
+      "sector": "Semiconductors",
+      "profile_computed": true
+    },
+    {
+      "symbol": "AMZN",
+      "sector": "E-commerce/Cloud",
+      "profile_computed": true
+    },
+    {
+      "symbol": "AAPL",
+      "sector": "Consumer Electronics",
+      "profile_computed": true
+    },
+    {
+      "symbol": "SNDK",
+      "sector": "Semiconductors",
+      "profile_computed": true
+    },
+    {
+      "symbol": "PLTR",
+      "sector": "Software",
+      "profile_computed": true
+    },
+    {
+      "symbol": "AMD",
+      "sector": "Semiconductors",
+      "profile_computed": true
+    },
+    {
+      "symbol": "GOOGL",
+      "sector": "Internet/Cloud",
+      "profile_computed": true
+    },
+    {
+      "symbol": "META",
+      "sector": "Social Media/AI",
+      "profile_computed": true
+    },
+    {
+      "symbol": "SPCX",
+      "sector": "ETF",
+      "profile_computed": true
+    },
+    {
+      "symbol": "TSLA",
+      "sector": "Auto/Energy",
+      "profile_computed": true
+    },
+    {
+      "symbol": "INTC",
+      "sector": "Semiconductors",
+      "profile_computed": true
+    },
+    {
+      "symbol": "AVGO",
+      "sector": "Semiconductors",
+      "profile_computed": true
+    },
+    {
+      "symbol": "ORCL",
+      "sector": "Software/Cloud",
+      "profile_computed": true
+    },
+    {
+      "symbol": "MRVL",
+      "sector": "Semiconductors",
+      "profile_computed": true
+    },
+    {
+      "symbol": "NBIS",
+      "sector": "Biotech",
+      "profile_computed": true
+    },
+    {
+      "symbol": "LITE",
+      "sector": "Semiconductors",
+      "profile_computed": true
+    },
+    {
+      "symbol": "STX",
+      "sector": "Storage",
+      "profile_computed": true
+    },
+    {
+      "symbol": "WDC",
+      "sector": "Storage",
+      "profile_computed": true
+    },
+    {
+      "symbol": "BE",
+      "sector": "Energy",
+      "profile_computed": true
+    },
+    {
+      "symbol": "CAT",
+      "sector": "Industrial",
+      "profile_computed": true
+    },
+    {
+      "symbol": "LLY",
+      "sector": "Pharma",
+      "profile_computed": true
+    },
+    {
+      "symbol": "WMT",
+      "sector": "Retail",
+      "profile_computed": true
+    },
+    {
+      "symbol": "JPM",
+      "sector": "Financials",
+      "profile_computed": true
+    },
+    {
+      "symbol": "SPY",
+      "sector": "S&P 500",
+      "profile_computed": true
+    },
+    {
+      "symbol": "IWM",
+      "sector": "Russell 2000",
+      "profile_computed": true
+    },
+    {
+      "symbol": "DIA",
+      "sector": "DJ Industrial Average",
+      "profile_computed": true
+    },
+    {
+      "symbol": "XLB",
+      "sector": "Basic Materials",
+      "profile_computed": true
+    },
+    {
+      "symbol": "XLC",
+      "sector": "Communication Services",
+      "profile_computed": true
+    },
+    {
+      "symbol": "XLY",
+      "sector": "Consumer Cyclical",
+      "profile_computed": true
+    },
+    {
+      "symbol": "XLP",
+      "sector": "Consumer Defensive",
+      "profile_computed": true
+    },
+    {
+      "symbol": "XLE",
+      "sector": "Energy",
+      "profile_computed": true
+    },
+    {
+      "symbol": "XLF",
+      "sector": "Financials",
+      "profile_computed": true
+    },
+    {
+      "symbol": "XLV",
+      "sector": "Health Care",
+      "profile_computed": true
+    },
+    {
+      "symbol": "XLI",
+      "sector": "Industrials",
+      "profile_computed": true
+    },
+    {
+      "symbol": "XLRE",
+      "sector": "Real Estate",
+      "profile_computed": true
+    },
+    {
+      "symbol": "SMH",
+      "sector": "Semiconductors",
+      "profile_computed": true
+    },
+    {
+      "symbol": "IGV",
+      "sector": "Software",
+      "profile_computed": true
+    },
+    {
+      "symbol": "XLK",
+      "sector": "Technology",
+      "profile_computed": true
+    },
+    {
+      "symbol": "XLU",
+      "sector": "Utilities",
+      "profile_computed": true
+    },
+    {
+      "symbol": "XBI",
+      "sector": "Biotech",
+      "profile_computed": true
+    },
+    {
+      "symbol": "GLD",
+      "sector": "Gold",
+      "profile_computed": true
+    },
+    {
+      "symbol": "TLT",
+      "sector": "Long-Term Treasuries",
+      "profile_computed": true
+    },
+    {
+      "symbol": "IBIT",
+      "sector": "Bitcoin",
+      "profile_computed": true
+    }
+  ]
+}

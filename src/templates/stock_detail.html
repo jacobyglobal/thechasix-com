@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}{{ ticker|default("ETF Detail") }} — The ChasIX{% endblock %}
+{% block title %}{{ ticker|default("Stock Detail") }} — The ChasIX{% endblock %}
 {% block content %}
 <section class="page-head">
   <h1><span id="detail-ticker">{{ ticker|default("SPY") }}</span> <small class="muted" id="detail-sector"></small></h1>
@@ -24,7 +24,7 @@
     </table>
   </div>
   <div class="card">
-    <h2>Similar ETFs / Market Profiles</h2>
+    <h2>Similar Assets / Market Profiles</h2>
     <ul class="similar-list" id="similar-list"></ul>
   </div>
 </section>

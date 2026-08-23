@@ -178,6 +178,11 @@
       var tr = document.createElement("tr");
       var html = "";
       columns.forEach(function (col) {
+        if (col.name === "Ticker") {
+          var sym = row.Ticker === null || row.Ticker === undefined ? "" : String(row.Ticker);
+          html += "<td><a href='/stock.html?ticker=" + encodeURIComponent(sym) + "'>" + sym + "</a></td>";
+          return;
+        }
         var v = row[col.name];
         var cls = cellClass(col.name, v);
         html += "<td" + (cls ? " class='" + cls + "'" : "") + ">" + fmtCell(col.name, v) + "</td>";

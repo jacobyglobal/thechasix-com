@@ -34,11 +34,16 @@ async def list_available_metrics() -> dict:
 
 
 @router.get("/breadth")
-async def market_breadth() -> dict:
-    """Return aggregate market breadth stats per duration horizon."""
-    df = load_breadth()
+async def market_breadth(scope: str = "etf") -> dict:
+    """Return aggregate market breadth stats per duration horizon.
+
+    Query params:
+        scope: 'etf' (default) restricts to the tracked ETF landscape;
+               'all' returns the universe-wide pipeline aggregates.
+    """
+    df = load_breadth(scope="etf" if scope.lower() == "etf" else "all")
     records = df.to_dict(orient="records")
-    return {"count": len(records), "items": records}
+    return {"count": len(records), "scope": "etf" if scope.lower() == "etf" else "all", "items": records}
 
 
 @router.get("/extremes")

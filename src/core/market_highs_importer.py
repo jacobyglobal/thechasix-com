@@ -27,6 +27,7 @@ DETAIL_CSV = MARKETHIGHS_DIR / "detail.csv"
 DETAIL_JSON = MARKETHIGHS_DIR / "detail.json"
 LEADERBOARD_CSV = MARKETHIGHS_DIR / "leaderboard.csv"
 BREADTH_CSV = MARKETHIGHS_DIR / "breadth.csv"
+ETFS_JSON = MARKETHIGHS_DIR / "etfs.json"
 
 DURATIONS = ["4w", "12w", "26w", "52w"]
 
@@ -150,14 +151,55 @@ def load_leaderboard_enriched() -> pd.DataFrame:
     return lb
 
 
-def load_breadth() -> pd.DataFrame:
-    """Load aggregate market breadth stats per duration, in 4w/12w/26w/52w order."""
-    df = pd.read_csv(BREADTH_CSV)
-    df["duration"] = df["duration"].astype(str)
-    order = {d: i for i, d in enumerate(DURATIONS)}
-    df["_order"] = df["duration"].map(order)
-    df = df.sort_values("_order").drop(columns="_order").reset_index(drop=True)
-    return df
+def load_etf_tickers() -> set[str]:
+    """Return the tracked ETF symbols (generated from MarketHighs etfs.yaml).
+
+    The sync script converts the pipeline's etfs.yaml config into etfs.json;
+    this is the authoritative "ETF landscape" used for homepage breadth and
+    leaderboard scoping.
+    """
+    if not ETFS_JSON.exists():
+        return set()
+    with open(ETFS_JSON, encoding="utf-8") as fh:
+        data = json.load(fh)
+    return {str(s).upper() for s in data.get("symbols", [])}
+
+
+def load_breadth(scope: str = "etf") -> pd.DataFrame:
+    """Return aggregate market breadth stats per duration (4w/12w/26w/52w).
+
+    scope='etf' (default) recomputes the same aggregates the pipeline emits in
+    breadth.csv but restricted to the tracked ETFs — used by the homepage,
+    which is ETF-only. scope='all' returns the universe-wide breadth.csv
+    verbatim.
+    """
+    if scope != "etf":
+        df = pd.read_csv(BREADTH_CSV)
+        df["duration"] = df["duration"].astype(str)
+        order = {d: i for i, d in enumerate(DURATIONS)}
+        df["_order"] = df["duration"].map(order)
+        return df.sort_values("_order").drop(columns="_order").reset_index(drop=True)
+
+    etfs = load_etf_tickers()
+    detail = load_detail()
+    sub = detail[detail["ticker"].isin(etfs)] if etfs else detail.iloc[0:0]
+    rows = []
+    for d in DURATIONS:
+        g = sub[sub["duration"] == d]
+        if g.empty:
+            continue
+        off_high = g["off_high_pct"].astype(float)
+        rows.append(
+            {
+                "duration": d,
+                "pct_at_high": round(100.0 * g["at_high"].astype(bool).mean(), 1),
+                "pct_at_low": round(100.0 * g["at_low"].astype(bool).mean(), 1),
+                "avg_off_high_pct": round(off_high.mean(), 2),
+                "avg_off_low_pct": round(g["off_low_pct"].astype(float).mean(), 2),
+                "median_off_high_pct": round(off_high.median(), 2),
+            }
+        )
+    return pd.DataFrame(rows)
 
 
 def get_ticker_profile(ticker: str) -> dict:
@@ -165,7 +207,8 @@ def get_ticker_profile(ticker: str) -> dict:
 
     Returns a dict keyed by duration containing natural-log off-high/off-low
     distances, deciles, and the ticker metadata. `off_high_pct` is the
-    natural-log distance ln(close/high)*100.
+    natural-log distance ln(close/high)*100. Enriched with the ticker's
+    composite_score (0-10) and leaderboard rank when present.
     """
     detail = load_detail()
     rows = detail[detail["ticker"] == ticker.upper()]
@@ -173,11 +216,19 @@ def get_ticker_profile(ticker: str) -> dict:
         return {}
     as_of = str(rows["date"].max())
     close = float(rows.sort_values("date")["recent_close"].iloc[-1])
+    lb = load_leaderboard()
+    score_row = lb[lb["ticker"] == ticker.upper()]
+    composite_score = (
+        float(score_row["composite_score"].iloc[0]) if len(score_row) else None
+    )
+    rank = int(score_row["rank"].iloc[0]) if len(score_row) else None
     profile = {
         "ticker": ticker.upper(),
         "sector": rows.iloc[0]["sector"],
         "date": as_of,
         "close": close,
+        "composite_score": composite_score,
+        "rank": rank,
         "durations": {},
     }
     for _, row in rows.iterrows():

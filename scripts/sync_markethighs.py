@@ -2,8 +2,8 @@
 """Sync MarketHighs pipeline output into the committed dataset.
 
 Copies a whole MarketHighs run (output manifests + per-ticker parquet price
-files) into data/markethighs/, which the Render backend serves via
-src/core/market_highs_importer.py. Per ARCH_REVIEW_GUIDE.md this is a manual
+files) into data/markethighs/, converts the pipeline's etfs.yaml ETF config
+into etfs.json (so the backend needs no YAML dependency), and is the manual
 data-refresh step for a dev machine -- it is never part of the frontend build
 path and is imported by nothing.
 
@@ -39,6 +39,24 @@ OUTPUT_FILES = [
     "leaderboard.csv",
     "breadth.csv",
 ]
+
+
+def parse_etf_entries(path: Path) -> list[dict]:
+    """Parse the simple etfs.yaml shape: tickers as `- symbol:` entries with
+    optional `enabled:` flags (stdlib-only; validated against the manifest)."""
+    entries: list[dict] = []
+    current: dict | None = None
+    for raw in path.read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if line.startswith("- symbol:"):
+            current = {
+                "symbol": line.split(":", 1)[1].strip().strip("\"'").upper(),
+                "enabled": True,
+            }
+            entries.append(current)
+        elif line.startswith("enabled:") and current is not None:
+            current["enabled"] = line.split(":", 1)[1].strip().lower() == "true"
+    return entries
 
 
 def fail(msg: str) -> None:
@@ -82,6 +100,23 @@ def main() -> None:
         manifest = json.loads((DEST_DIR / "universe.json").read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         fail(f"cannot read universe.json manifest: {exc}")
+
+    # Convert etfs.yaml -> etfs.json so the backend never needs a YAML
+    # dependency; every symbol is validated against the run manifest.
+    etfs_yaml = src / "etfs.yaml"
+    if not etfs_yaml.is_file():
+        fail(f"missing MarketHighs ETF config: {etfs_yaml}")
+    entries = parse_etf_entries(etfs_yaml)
+    manifest_symbols = {str(t.get("symbol", "")).upper() for t in manifest.get("tickers", [])}
+    etf_symbols = [e["symbol"] for e in entries if e["enabled"]]
+    if not etf_symbols:
+        fail(f"parsed no enabled ETF symbols from {etfs_yaml} -- parser or format drift")
+    unknown = [s for s in etf_symbols if s not in manifest_symbols]
+    if unknown:
+        fail(f"etfs.yaml symbols absent from universe.json: {', '.join(unknown)}")
+    with open(DEST_DIR / "etfs.json", "w", encoding="utf-8") as fh:
+        json.dump({"source": "etfs.yaml", "count": len(etf_symbols), "symbols": etf_symbols}, fh, indent=2)
+        fh.write("\n")
 
     tickers = manifest.get("tickers") or []
     total = int(manifest.get("ticker_count", len(tickers)))
@@ -131,6 +166,7 @@ def main() -> None:
     print(
         f"\nRun summary: as_of={as_of}  universe={total}  profiled={profiled}"
         f"  detail_rows={sum(1 for _ in detail)}  parquet_files={len(src_parquets)}"
+        f"  etfs={len(etf_symbols)}"
     )
     if pruned:
         print(f"Pruned stale parquet files: {', '.join(pruned)}")

@@ -7,6 +7,7 @@ from fastapi import APIRouter, HTTPException
 from src.core.market_highs_importer import (
     load_leaderboard_enriched,
     get_ticker_profile,
+    load_etf_tickers,
     load_price_history,
     DURATIONS,
 )
@@ -21,6 +22,7 @@ async def list_stocks(
     sort_by: str = "composite_score",
     order: str = "desc",
     sector: str | None = None,
+    type: str | None = None,
     limit: int = 50,
 ) -> dict:
     """Return the ETF/sector leaderboard.
@@ -29,11 +31,16 @@ async def list_stocks(
         sort_by: column to sort on (default composite_score)
         order: 'asc' or 'desc'
         sector: optional sector name filter
+        type: 'etf' restricts to the tracked ETF landscape (homepage scope);
+              default returns the full universe (stocks + ETFs)
         limit: max number of rows
     """
     df = load_leaderboard_enriched()
     if sector:
         df = df[df["sector"].str.lower() == sector.lower()]
+    if type and type.lower() == "etf":
+        etfs = load_etf_tickers()
+        df = df[df["ticker"].isin(etfs)]
     if sort_by in df.columns:
         df = df.sort_values(sort_by, ascending=(order.lower() == "asc"))
     df = df.head(limit)

@@ -58,10 +58,10 @@
     var grid = document.querySelector(".breadth-grid");
     var label = document.querySelector(".breadth-card .muted");
     if (!grid) return;
-    fetch(API_ROOT + "/api/metrics/breadth")
+    fetch(API_ROOT + "/api/metrics/breadth?scope=etf")
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(function (data) {
-        label.textContent = "Average distance from period highs by horizon.";
+        label.textContent = "Average distance from period highs across the tracked ETFs.";
         grid.innerHTML = "";
         data.items.forEach(function (row) {
           var tile = document.createElement("div");
@@ -83,10 +83,10 @@
     var tbody = document.querySelector("[data-leaderboard] tbody");
     var label = document.querySelector(".leaderboard-card .muted");
     if (!tbody) return;
-    fetch(API_ROOT + "/api/stocks?limit=10")
+    fetch(API_ROOT + "/api/stocks?limit=10&type=etf")
       .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
       .then(function (data) {
-        label.textContent = "As of " + fmtDate(data.as_of) + " — top 10 composite market profiles.";
+        label.textContent = "As of " + fmtDate(data.as_of) + " — top 10 ETF market profiles.";
         tbody.innerHTML = "";
         data.items.forEach(function (row) {
           var tr = document.createElement("tr");
@@ -286,6 +286,13 @@
         document.getElementById("detail-ticker").textContent = profile.ticker;
         document.getElementById("detail-sector").textContent =
           profile.sector + " · close " + fmtNum(profile.close) + " · as of " + fmtDate(profile.date);
+        var scoreEl = document.getElementById("profile-score");
+        if (scoreEl) {
+          scoreEl.textContent =
+            profile.composite_score !== null && profile.composite_score !== undefined && !isNaN(profile.composite_score)
+              ? "(" + Number(profile.composite_score).toFixed(1) + " of 10)"
+              : "";
+        }
         var tbody = document.querySelector("#profile-table tbody");
         tbody.innerHTML = "";
         ["4w", "12w", "26w", "52w"].forEach(function (d) {

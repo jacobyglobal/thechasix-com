@@ -1,0 +1,26 @@
+{
+  "source": "etfs.yaml",
+  "count": 20,
+  "symbols": [
+    "SPY",
+    "IWM",
+    "DIA",
+    "XLB",
+    "XLC",
+    "XLY",
+    "XLP",
+    "XLE",
+    "XLF",
+    "XLV",
+    "XLI",
+    "XLRE",
+    "SMH",
+    "IGV",
+    "XLK",
+    "XLU",
+    "XBI",
+    "GLD",
+    "TLT",
+    "IBIT"
+  ]
+}

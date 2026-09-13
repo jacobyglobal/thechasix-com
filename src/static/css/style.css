@@ -200,6 +200,28 @@ main.container { padding-top: 32px; padding-bottom: 64px; }
 .screener-controls input:focus, .screener-controls select:focus { outline: none; border-color: var(--accent); }
 #screener-count { margin-top: 12px; }
 
+/* Segmented asset-type toggle */
+.segmented {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.seg-btn {
+  background: var(--bg-card);
+  color: var(--text);
+  border: none;
+  border-right: 1px solid var(--border);
+  padding: 9px 16px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+.seg-btn:last-child { border-right: none; }
+.seg-btn:hover { background: var(--accent-soft); }
+.seg-btn.active { background: var(--accent); color: #fff; }
+
 /* Watchlist */
 #watchlist-table { border-collapse: separate; border-spacing: 0; }
 #watchlist-table thead th {

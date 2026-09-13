@@ -4,10 +4,15 @@
 {% block content %}
 <section class="page-head">
   <h1>Stock Watchlist</h1>
-  <p class="muted">Daily watchlist of liquid names — ATR, 52-week range, TD range rank, idiosyncratic relative volume, and the Jacoby Range Index / Volume Profile Oscillator. Click a column header to sort; hover the ⓘ to see that column's definition.</p>
+  <p class="muted">Daily watchlist of liquid names — ATR, 52-week range, TD range rank, idiosyncratic relative volume, and the Jacoby Range Index / Volume Profile Oscillator. Filter by asset type, click a column header to sort; hover the ⓘ to see that column's definition.</p>
 </section>
 
 <div class="screener-controls">
+  <div class="segmented" id="type-toggle" role="group" aria-label="Filter by asset type">
+    <button type="button" class="seg-btn active" data-type="all" aria-pressed="true">All</button>
+    <button type="button" class="seg-btn" data-type="Stock" aria-pressed="false">Stocks</button>
+    <button type="button" class="seg-btn" data-type="ETF" aria-pressed="false">ETFs</button>
+  </div>
   <input type="text" id="filter-ticker" placeholder="Filter ticker…" />
   <button class="btn btn-outline" id="btn-reset">Reset</button>
   <button class="btn btn-outline" id="btn-guide-toggle">Column Guide</button>

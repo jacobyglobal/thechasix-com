@@ -29,6 +29,7 @@
   var sortAsc = true;
   var page = 1;
   var pageSize = 10;
+  var typeFilter = "all"; /* "all" | "Stock" | "ETF" — client-side asset-type filter */
 
   function fmtNum(v, dec) {
     if (v === null || v === undefined || isNaN(v)) return "—";
@@ -72,6 +73,14 @@
     thead.querySelectorAll("th").forEach(function (th) {
       th.classList.toggle("sorted", th.getAttribute("data-sort") === sortKey);
       th.classList.toggle("desc", th.getAttribute("data-sort") === sortKey && !sortAsc);
+    });
+  }
+
+  function paintTypeToggle() {
+    document.querySelectorAll("#type-toggle .seg-btn").forEach(function (btn) {
+      var active = btn.getAttribute("data-type") === typeFilter;
+      btn.classList.toggle("active", active);
+      btn.setAttribute("aria-pressed", active ? "true" : "false");
     });
   }
 
@@ -150,7 +159,8 @@
     var q = (document.getElementById("filter-ticker").value || "").toLowerCase();
 
     var shown = rows.filter(function (r) {
-      return !q || String(r.Ticker).toLowerCase().indexOf(q) !== -1;
+      var typeHit = typeFilter === "all" || r.Type === typeFilter;
+      return typeHit && (!q || String(r.Ticker).toLowerCase().indexOf(q) !== -1);
     });
 
     shown.sort(function (a, b) {
@@ -294,7 +304,7 @@
       .then(function (data) {
         rows = data.items;
         columns = data.columns;
-        if (dateEl) dateEl.textContent = "As of " + fmtDate(data.as_of) + " — 18 months of daily data.";
+        if (dateEl) dateEl.textContent = "As of " + fmtDate(data.as_of) + " — updated daily.";
         var hint = document.getElementById("watchlist-scroll-hint");
         if (hint) hint.textContent = "Scroll right for all " + columns.length + " columns.";
         buildHeader();
@@ -317,9 +327,19 @@
       page = 1;
       render();
     });
+    document.querySelectorAll("#type-toggle .seg-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        typeFilter = btn.getAttribute("data-type");
+        paintTypeToggle();
+        page = 1;
+        render();
+      });
+    });
     var reset = document.getElementById("btn-reset");
     if (reset) reset.addEventListener("click", function () {
       filter.value = "";
+      typeFilter = "all";
+      paintTypeToggle();
       page = 1;
       render();
     });

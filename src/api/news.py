@@ -91,8 +91,12 @@ async def get_news(
         query = query.offset(offset).limit(limit)
 
     async with AsyncSessionLocal() as session:
-        result = await session.execute(query)
-        rows = result.scalars().all()
+        try:
+            result = await session.execute(query)
+            rows = result.scalars().all()
+        except Exception as e:
+            logger.error(f"Error fetching news: {e}")
+            raise HTTPException(status_code=500, detail=str(e))
 
     if top_n_per_ticker and top_n_per_ticker > 0:
         # Whole result trusted to be pre-sorted by signal strength (strongest

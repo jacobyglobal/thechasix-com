@@ -3,8 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% block title %}The ChasIX{% endblock %}</title>
-  <meta name="description" content="{% block description %}Financial intelligence: ETF market highs, sector breadth, and market data.{% endblock %}" />
+  <title>{% block title %}The ChasIX — Financial Intelligence Platform{% endblock %}</title>
+  <meta name="description" content="{% block description %}Financial intelligence platform providing ETF market highs, sector breadth metrics, and stock market analytics.{% endblock %}" />
+  <meta property="og:site_name" content="The ChasIX" />
+  <meta property="og:title" content="{% block og_title %}{{ self.title() }}{% endblock %}" />
+  <meta property="og:description" content="{% block og_description %}{{ self.description() }}{% endblock %}" />
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}" />
+  <meta property="og:url" content="{% block og_url %}https://thechasix.com{% endblock %}" />
+  <meta property="og:image" content="{% block og_image %}https://thechasix.com/og-image.png{% endblock %}" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="{% block twitter_title %}{{ self.title() }}{% endblock %}" />
+  <meta name="twitter:description" content="{% block twitter_description %}{{ self.description() }}{% endblock %}" />
+  <meta name="twitter:image" content="{% block twitter_image %}{{ self.og_image() }}{% endblock %}" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />

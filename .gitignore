@@ -56,11 +56,12 @@ plan.human.md
 status.md
 opencode.json
 opencode.json.backup
-backlog.csv
 planning.csv
 
 # Sprint planning docs (not functionality; kept local only)
 sprints/
+backlog.csv
+completed.csv
 
 # QA scratch output
 QA/

@@ -1,8 +1,15 @@
 {
   "_meta": {
     "schema": "watchlist-column-guide",
-    "version": 2,
-    "column_count": 24
+    "version": 3,
+    "column_count": 44,
+    "views": {
+      "base": "Identity, latest-bar price, and sector - the table anchor.",
+      "volatility": "Volatility measures derived from the bar's price action.",
+      "volume": "Volume and liquidity measures.",
+      "horizon": "Multi-horizon distance-from-high/low stats and deciles.",
+      "jacoby": "Jacoby indicators and their supporting series."
+    }
   },
   "columns": [
     {
@@ -10,168 +17,334 @@
       "kind": "base",
       "formula": "",
       "meaning": "Symbol from the watchlist.",
-      "recompute": ""
+      "recompute": "",
+      "view": "base"
+    },
+    {
+      "name": "Type",
+      "kind": "base",
+      "formula": "",
+      "meaning": "Security classification from config/watchlist.yaml: \"ETF\" or \"Stock\" (entries without an explicit type default to Stock).",
+      "recompute": "",
+      "view": "base"
+    },
+    {
+      "name": "Sector",
+      "kind": "base",
+      "formula": "",
+      "meaning": "Sector/label for the ticker from config/watchlist.yaml (MarketHighs groups by this). The benchmark renders as 'Benchmark'.",
+      "recompute": "",
+      "view": "base"
     },
     {
       "name": "Date",
       "kind": "base",
       "formula": "",
       "meaning": "Trading date of the latest bar used for the row.",
-      "recompute": ""
+      "recompute": "",
+      "view": "base"
     },
     {
       "name": "Open",
       "kind": "base",
       "formula": "",
       "meaning": "Raw daily open from yfinance.",
-      "recompute": ""
+      "recompute": "",
+      "view": "base"
     },
     {
       "name": "High",
       "kind": "base",
       "formula": "",
       "meaning": "Raw daily high from yfinance.",
-      "recompute": ""
+      "recompute": "",
+      "view": "base"
     },
     {
       "name": "Low",
       "kind": "base",
       "formula": "",
       "meaning": "Raw daily low from yfinance.",
-      "recompute": ""
+      "recompute": "",
+      "view": "base"
     },
     {
       "name": "Close",
       "kind": "base",
       "formula": "",
       "meaning": "Raw daily close from yfinance.",
-      "recompute": ""
+      "recompute": "",
+      "view": "base"
     },
     {
       "name": "Volume (Vol)",
       "kind": "base",
       "formula": "",
       "meaning": "Raw daily share volume (Vol = Volume); basis for all Vol ... columns.",
-      "recompute": ""
+      "recompute": "",
+      "view": "volume"
     },
     {
       "name": "Typical Price (TP)",
       "kind": "intermediate",
       "formula": "(Open + High + Low + Close) / 4",
       "meaning": "A per-bar typical-price proxy standing in for intraday VWAP throughout the watchlist (used by Normalized ATR (NATR), TD Range Rank, Notional Turnover ($M), and the Jacoby indicators).",
-      "recompute": ""
+      "recompute": "",
+      "view": "jacoby"
     },
     {
       "name": "True Range (TR)",
       "kind": "intermediate",
       "formula": "Max(High - Low, |High - Typical Price (TP)|, |Typical Price (TP) - Low|)",
       "meaning": "The daily true range of the bar, measured from the Typical Price (TP) proxy price instead of the close. It is the input series to Average True Range (ATR).",
-      "recompute": ""
+      "recompute": "",
+      "view": "volatility"
     },
     {
       "name": "Average True Range (ATR)",
       "kind": "intermediate",
       "formula": "EMA21(True Range (TR))",
       "meaning": "The 21-day average true range anchored at the Typical Price (TP) proxy price - a volatility measure in dollar terms.",
-      "recompute": ""
+      "recompute": "",
+      "view": "volatility"
     },
     {
       "name": "Normalized ATR (NATR)",
       "kind": "computed",
       "formula": "((Typical Price (TP) + Average True Range (ATR)) / Typical Price (TP)) * 100",
       "meaning": "Average True Range (ATR) expressed as a percentage of price. Normalized ATR (NATR) - 100 is the ATR as a % of price; values well above 100 indicate an expanded daily range relative to price.",
-      "recompute": "(Typical Price (TP) + Average True Range (ATR)) / Typical Price (TP) * 100"
+      "recompute": "(Typical Price (TP) + Average True Range (ATR)) / Typical Price (TP) * 100",
+      "view": "volatility"
     },
     {
       "name": "52-Week High",
       "kind": "intermediate",
       "formula": "Highest(High, 252)",
       "meaning": "The 52-week trading range boundary - the upper DeMark High/Low reference level.",
-      "recompute": ""
+      "recompute": "",
+      "view": "horizon"
     },
     {
       "name": "52-Week Low",
       "kind": "intermediate",
       "formula": "Lowest(Low, 252)",
       "meaning": "The 52-week trading range boundary - the lower DeMark High/Low reference level.",
-      "recompute": ""
+      "recompute": "",
+      "view": "horizon"
     },
     {
       "name": "52-Week Range Position",
       "kind": "intermediate",
       "formula": "52-Week High - 52-Week Low",
       "meaning": "The width of the 52-week high-low range, in dollars. The band against which TD Range Rank places the current price.",
-      "recompute": ""
+      "recompute": "",
+      "view": "horizon"
     },
     {
       "name": "TD Range Rank",
       "kind": "computed",
       "formula": "((Typical Price (TP) - 52-Week Low) / 52-Week Range Position) * 100 - 50   (rounded to 1 decimal)",
       "meaning": "Where the Typical Price (TP) price sits inside the 52-week high-low range, on a 0-centered scale of [-50, +50]. Above zero = upper half of the yearly range; below zero = lower half. The sentinel 65.0 is used when the range is zero (rare).",
-      "recompute": "(Typical Price (TP) - 52-Week Low) / 52-Week Range Position * 100 - 50"
+      "recompute": "(Typical Price (TP) - 52-Week Low) / 52-Week Range Position * 100 - 50",
+      "view": "horizon"
     },
     {
       "name": "Session Return %",
       "kind": "computed",
       "formula": "log(Close / Open) * 100",
       "meaning": "Continuously-compounded percent change from the open to the close. Positive = closed above the open; negative = closed below.",
-      "recompute": ""
+      "recompute": "",
+      "view": "volatility"
     },
     {
       "name": "21-Period EMA Volume",
       "kind": "intermediate",
       "formula": "EMA21(Volume)",
       "meaning": "The 21-day exponential moving average of volume (Vol). The baseline for Relative Volume (RVOL EMA).",
-      "recompute": ""
+      "recompute": "",
+      "view": "volume"
     },
     {
       "name": "Relative Volume (RVOL EMA)",
       "kind": "computed",
       "formula": "Volume / 21-Period EMA Volume * 100   (rounded to 1 decimal)",
       "meaning": "Current volume relative to its 21-day exponential average. 100 = average activity; >130 = heavy volume; <80 = light volume.",
-      "recompute": "Volume / 21-Period EMA Volume * 100"
+      "recompute": "Volume / 21-Period EMA Volume * 100",
+      "view": "volume"
     },
     {
       "name": "21-Period Median Volume",
       "kind": "intermediate",
       "formula": "Median(Volume, 21)",
       "meaning": "The 21-day median volume (Vol) - the baseline for the ticker side of Idiosyncratic RVOL.",
-      "recompute": ""
+      "recompute": "",
+      "view": "volume"
     },
     {
       "name": "Relative Volume (RVOL Median)",
       "kind": "computed",
       "formula": "Volume / 21-Period Median Volume * 100",
       "meaning": "The ticker's volume (Vol) as a percentage of its own 21-day median volume. 100 = median activity.",
-      "recompute": "Volume / 21-Period Median Volume * 100"
+      "recompute": "Volume / 21-Period Median Volume * 100",
+      "view": "volume"
     },
     {
       "name": "Idiosyncratic RVOL",
       "kind": "computed",
       "formula": "log(Relative Volume (RVOL Median) / qqqVolPct) * 100   where qqqVolPct = QQQ row's Relative Volume (RVOL Median)",
       "meaning": "The ticker's volume (Vol) normalized against the market's (QQQ's) relative volume, log-scaled. 0 = the stock's volume activity matches the market's; positive = trading on relatively higher volume than the market; negative = lighter. The name reflects the market-normalized, asset-specific (idiosyncratic) component of volume.",
-      "recompute": "log(Relative Volume (RVOL Median) / QQQ's Relative Volume (RVOL Median)) * 100, using the QQQ row for the denominator"
+      "recompute": "log(Relative Volume (RVOL Median) / QQQ's Relative Volume (RVOL Median)) * 100, using the QQQ row for the denominator",
+      "view": "volume"
     },
     {
       "name": "Notional Turnover ($M)",
       "kind": "computed",
       "formula": "round(Volume * Typical Price (TP) / 1_000_000)",
       "meaning": "Dollar value traded for the day in millions (volume weighted at the Typical Price (TP) proxy price). A liquidity/participation measure: large, liquid names show high values. Holds the raw numeric value for easy sorting.",
-      "recompute": "Volume * Typical Price (TP) / 1_000_000, rounded"
+      "recompute": "Volume * Typical Price (TP) / 1_000_000, rounded",
+      "view": "volume"
     },
     {
       "name": "Jacoby Range Index",
       "kind": "computed",
       "formula": "Weighted average of RangePos_i across the 4/12/26/52-week boundaries, weight_i = base_weight_i * (1 + 0.5 * |RangePos_i| / 50); RangePos_i = (Typical Price (TP) - Low_i) / (High_i - Low_i) * 100 - 50; base weights 0.15 / 0.20 / 0.25 / 0.40   (rounded to 1 decimal)",
       "meaning": "A multi-timeframe DeMark position score on the same [-50, +50] scale as TD Range Rank. The 52-week (0.40), 26-week (0.25), 12-week (0.20), and 4-week (0.15) range positions are blended with a linear proximity bonus: a timeframe whose boundary price is actively hugging earns up to a 50% weight boost, while mid-range timeframes keep their base weight. The heavier macro base weights keep the score anchored to the annual structure, so short-term boundary pressure modulates rather than overwhelms the 52-week trend. Above zero = upper half of the structural range.",
-      "recompute": ""
+      "recompute": "",
+      "view": "jacoby"
     },
     {
       "name": "Jacoby Volume Profile Oscillator",
       "kind": "computed",
       "formula": "ln(Fast VPOC / Slow VPOC) * 100, rounded to 2 decimals. Fast VPOC = synthetic volume point of control over the last 20 bars (40 bins); Slow VPOC = over the last 252 bars (70 bins).",
       "meaning": "Short-term institutional volume migration vs the annual baseline. Log scaling preserves the 1-year macro anchor while compressing the +500% outliers of multi-bagger re-ratings (max near +200%); for moderate values it tracks the linear percentage closely. Positive = the fast 20-bar VPOC sits above the 252-bar annual VPOC (upward structural migration); negative = compressed below it. Tickers with fewer than 252 bars of history (recent IPOs such as SPCX, ~36 bars) use the full available history for the slow baseline and an 8-bar fast window, since the 252-bar annual baseline is unavailable.",
-      "recompute": ""
+      "recompute": "",
+      "view": "jacoby"
+    },
+    {
+      "name": "off_high_pct_4w",
+      "view": "horizon",
+      "kind": "computed",
+      "formula": "(Close / HIGHEST(High, 4w) - 1) * 100   (<= 0)",
+      "meaning": "How far the latest close sits below the highest High over the N-day window. 0 = close equals the window peak high; negative = below it."
+    },
+    {
+      "name": "off_low_pct_4w",
+      "view": "horizon",
+      "kind": "computed",
+      "formula": "(Close / LOWEST(Low, 4w) - 1) * 100   (>= 0)",
+      "meaning": "How far the latest close sits above the lowest Low over the N-day window. 0 = close equals the window floor low; larger = further above it."
+    },
+    {
+      "name": "high_decile_4w",
+      "view": "horizon",
+      "kind": "computed",
+      "formula": "Decile(1-10) of the latest off_high_pct within its own 10y history   (10 = strongest, nearest the window high)",
+      "meaning": "Where today's distance-from-high ranks in the ticker's 10-year history. 10 = at/near the window high (strongest); 1 = deepest below it. Polarity is strength, shared with the low decile."
+    },
+    {
+      "name": "low_decile_4w",
+      "view": "horizon",
+      "kind": "computed",
+      "formula": "11 - off_low_decile   (MarketHighs raw off_low_decile is a weakness measure, 10 = nearest the low)",
+      "meaning": "Strength-scaled low decile: where today's distance-from-low ranks in the ticker's 10-year history, inverted so 10 = nearest the low AND therefore strongest. Shares polarity with the high decile."
+    },
+    {
+      "name": "off_high_pct_12w",
+      "view": "horizon",
+      "kind": "computed",
+      "formula": "(Close / HIGHEST(High, 12w) - 1) * 100   (<= 0)",
+      "meaning": "How far the latest close sits below the highest High over the N-day window. 0 = close equals the window peak high; negative = below it."
+    },
+    {
+      "name": "off_low_pct_12w",
+      "view": "horizon",
+      "kind": "computed",
+      "formula": "(Close / LOWEST(Low, 12w) - 1) * 100   (>= 0)",
+      "meaning": "How far the latest close sits above the lowest Low over the N-day window. 0 = close equals the window floor low; larger = further above it."
+    },
+    {
+      "name": "high_decile_12w",
+      "view": "horizon",
+      "kind": "computed",
+      "formula": "Decile(1-10) of the latest off_high_pct within its own 10y history   (10 = strongest, nearest the window high)",
+      "meaning": "Where today's distance-from-high ranks in the ticker's 10-year history. 10 = at/near the window high (strongest); 1 = deepest below it. Polarity is strength, shared with the low decile."
+    },
+    {
+      "name": "low_decile_12w",
+      "view": "horizon",
+      "kind": "computed",
+      "formula": "11 - off_low_decile   (MarketHighs raw off_low_decile is a weakness measure, 10 = nearest the low)",
+      "meaning": "Strength-scaled low decile: where today's distance-from-low ranks in the ticker's 10-year history, inverted so 10 = nearest the low AND therefore strongest. Shares polarity with the high decile."
+    },
+    {
+      "name": "off_high_pct_26w",
+      "view": "horizon",
+      "kind": "computed",
+      "formula": "(Close / HIGHEST(High, 26w) - 1) * 100   (<= 0)",
+      "meaning": "How far the latest close sits below the highest High over the N-day window. 0 = close equals the window peak high; negative = below it."
+    },
+    {
+      "name": "off_low_pct_26w",
+      "view": "horizon",
+      "kind": "computed",
+      "formula": "(Close / LOWEST(Low, 26w) - 1) * 100   (>= 0)",
+      "meaning": "How far the latest close sits above the lowest Low over the N-day window. 0 = close equals the window floor low; larger = further above it."
+    },
+    {
+      "name": "high_decile_26w",
+      "view": "horizon",
+      "kind": "computed",
+      "formula": "Decile(1-10) of the latest off_high_pct within its own 10y history   (10 = strongest, nearest the window high)",
+      "meaning": "Where today's distance-from-high ranks in the ticker's 10-year history. 10 = at/near the window high (strongest); 1 = deepest below it. Polarity is strength, shared with the low decile."
+    },
+    {
+      "name": "low_decile_26w",
+      "view": "horizon",
+      "kind": "computed",
+      "formula": "11 - off_low_decile   (MarketHighs raw off_low_decile is a weakness measure, 10 = nearest the low)",
+      "meaning": "Strength-scaled low decile: where today's distance-from-low ranks in the ticker's 10-year history, inverted so 10 = nearest the low AND therefore strongest. Shares polarity with the high decile."
+    },
+    {
+      "name": "off_high_pct_52w",
+      "view": "horizon",
+      "kind": "computed",
+      "formula": "(Close / HIGHEST(High, 52w) - 1) * 100   (<= 0)",
+      "meaning": "How far the latest close sits below the highest High over the N-day window. 0 = close equals the window peak high; negative = below it."
+    },
+    {
+      "name": "off_low_pct_52w",
+      "view": "horizon",
+      "kind": "computed",
+      "formula": "(Close / LOWEST(Low, 52w) - 1) * 100   (>= 0)",
+      "meaning": "How far the latest close sits above the lowest Low over the N-day window. 0 = close equals the window floor low; larger = further above it."
+    },
+    {
+      "name": "high_decile_52w",
+      "view": "horizon",
+      "kind": "computed",
+      "formula": "Decile(1-10) of the latest off_high_pct within its own 10y history   (10 = strongest, nearest the window high)",
+      "meaning": "Where today's distance-from-high ranks in the ticker's 10-year history. 10 = at/near the window high (strongest); 1 = deepest below it. Polarity is strength, shared with the low decile."
+    },
+    {
+      "name": "low_decile_52w",
+      "view": "horizon",
+      "kind": "computed",
+      "formula": "11 - off_low_decile   (MarketHighs raw off_low_decile is a weakness measure, 10 = nearest the low)",
+      "meaning": "Strength-scaled low decile: where today's distance-from-low ranks in the ticker's 10-year history, inverted so 10 = nearest the low AND therefore strongest. Shares polarity with the high decile."
+    },
+    {
+      "name": "composite_score",
+      "view": "horizon",
+      "kind": "computed",
+      "formula": "Weighted average of high_decile_X across 4w/12w/26w/52w, weights 1/2/3/4   (rounded to 2 decimals)",
+      "meaning": "The MarketHighs composite: how strong the ticker's position is across all durations on the strength scale (10 = consistently at/above its own multi-year extremes)."
+    },
+    {
+      "name": "rank",
+      "view": "horizon",
+      "kind": "computed",
+      "formula": "1-based rank by composite_score, descending",
+      "meaning": "Cross-sectional leaderboard rank of the ticker across the full universe."
     }
   ]
 }

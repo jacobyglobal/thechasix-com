@@ -1,39 +1,42 @@
-# Implementation Plan — TEST-01
+# Implementation Plan — TEST-02
 
-**Task:** Add default meta title, description, and Open Graph tags to `src/templates/base.html`
-**Epic:** Frontend Verification (SEO-01)
+**Task:** Create `src/api/health.py` with a `GET /api/health` service-status endpoint and a pytest test
+**Epic:** Backend Verification (PIPE-01)
 **Status:** Pending
 
 ## 1. Objective
-Add default (non-unique) SEO metadata to `src/templates/base.html` so every page ships a complete, socially-shareable `<head>`: meta title, meta description, Open Graph tags (`og:*`), and Twitter Card tags. All values are overridable per-page via Jinja2 blocks so child templates can later supply unique `SEO-01` metadata. No backend code or API changes.
+Add a `GET /api/health` service-status endpoint that is cheap, dependency-free, and **always returns 200** — so Render/UptimeRobot monitoring can probe liveness without tripping on transient DB cold-starts. It reports service identity, version, uptime, and best-effort database reachability (mirroring the "continuing without DB" resilience in `src/main.py`'s lifespan), plus a pytest suite covering status code and response shape.
 
 ## 2. Changes
 
-### `src/templates/base.html` (edit)
-Current state: `title` and `description` blocks already exist (defaults added in `668ef2e`); the full OG/Twitter block set is **already written but uncommitted** in the working tree. Changes to commit:
-- **Meta title** — keep existing default: `<title>{% block title %}The ChasIX — Financial Intelligence Platform{% endblock %}</title>` (~30 chars, includes brand).
-- **Meta description** — keep existing default block: *"Financial intelligence platform providing ETF market highs, sector breadth metrics, and stock market analytics."* (~90–120 chars, has CTA keywords).
-- **Open Graph tags** — `og:site_name="The ChasIX"`; `og:title`/`og:description` default to the page `title`/`description` via `{{ self.title() }}` / `{{ self.description() }}`; `og:type=website`; `og:url` default `https://thechasix.com`; `og:image` default `https://thechasix.com/og-image.png` — each wrapped in its own `{% block %}` (e.g. `og_title`, `og_url`, `og_image`) for per-page override.
-- **Twitter Card tags** — `twitter:card=summary_large_image`, `twitter:title`/`twitter:description` default to `self.title()`/`self.description()`, `twitter:image` defaults to `self.og_image()`; each in its own block.
-- **Note / follow-up (out of scope)**: `og:image` references an `og-image.png` that does not yet exist on the host — create it or point at an existing branded asset in a later task before social previews go live. Same for a per-page `canonical` tag (SEO-01 cleanup), which is not part of this default-tags task.
+### `src/api/health.py` (new — ALREADY BUILT)
+- `APIRouter()` exposing `GET ""` under the `/api/health` prefix.
+- Module-level `_START = time.monotonic()` and `VERSION = "0.1.0"`.
+- `_check_database()` → async, runs `SELECT 1` on the shared `src.core.cache.engine`; returns `"up"`/`"down"`, **never raises** (DB failure is logged and reported as `"down"`).
+- Handler returns: `{"status": "ok", "service": "thechasix-api", "version", "uptime_seconds": int, "database": "up"|"down"}`.
 
-### Child templates (no change required for this task)
-- Already override `title`/`description`: `stock_detail.html`, `calculator.html`, `news.html`, `watchlist.html`, `index.html` (title only), `screener.html` (title only), `pricing.html` (title only).
-- Pages without a custom `description` fall back to the `base.html` default — acceptable for TEST-01; unique per-page copy is the SEO-01 follow-up.
+### `src/main.py` (edit — ALREADY DONE)
+- `src/main.py:23` — import `router as health_router` from `src.api.health`.
+- `src/main.py:80` — `app.include_router(health_router, prefix="/api/health", tags=["health"])`.
+- Note: keep the pre-existing root `GET /health` (`src/main.py:89`) for Render's own health probe — it is redundant but harmless; do not remove it in this task.
 
-### `dist/` (regenerate — REQUIRED)
-- This task touches `src/templates/`, so `dist/` must be rebuilt and committed in the same commit (zero-build Netlify publishes `dist/`).
-- Verify: `.venv/bin/python -m src.build_frontend`
+### `src/tests/test_health.py` (new — ALREADY BUILT)
+- `TestClient(app)` hitting `/api/health`.
+- `test_health_returns_200` — asserts `resp.status_code == 200`.
+- `test_health_shape` — asserts all five keys present; `status == "ok"`, `service == "thechasix-api"`, `uptime_seconds` is `int`, `database in ("up", "down")`.
+
+### `dist/` (NOT required)
+- Backend-only task — no `src/templates/` or `src/static/` touched, so no frontend rebuild.
 
 ## 3. Implementation Steps
-1. Confirm `src/templates/base.html` `<head>` contains the full meta block set (title, description, `og:site_name/title/description/type/url/image`, `twitter:card/title/description/image`) — edit if the uncommitted working-tree version is incomplete.
-2. Rebuild `dist/`: `.venv/bin/python -m src.build_frontend`.
-3. Spot-check rendered output in `dist/index.html` (and one child page) that the default tags appear and child overrides win.
-4. Commit all `src/templates/base.html` + `dist/*` changes together with a conventional message (e.g., `feat: add default meta + Open Graph/Twitter tags to base template (TEST-01)`).
-5. `git status -sb` to confirm no stale uncommitted `dist/`.
+1. Confirm `src/api/health.py`, the `src/main.py` wiring, and `src/tests/test_health.py` match the changes above (files already exist and are wired).
+2. Verify the test suite passes: `.venv/bin/python -m pytest src/tests/test_health.py -v` (expected: 2 passed).
+3. Run the full suite: `.venv/bin/python -m pytest` (per `test_queue.yaml` verify_cmd) to confirm no regressions — e.g. `main.py` import order, shared `engine` import.
+4. Architecture review gate already applies to `src/api/*` additions — note in the commit (a `.opencode/reviews/` file for the health endpoint does not yet exist; if required, run `.venv/bin/python .opencode/skill/arch-review/run.py "Health Service-Status Endpoint"`).
+5. Commit backend files (`src/api/health.py`, `src/main.py`, `src/tests/test_health.py`) with a conventional message (e.g., `feat: add /api/health service-status endpoint + tests (TEST-02)`).
+6. `git status -sb` to confirm only intended files are staged and no stale `dist/` drift.
 
 ## 4. Definition of Done
-- `base.html` ships default `<title>`, `<meta name="description">`, Open Graph (`og:*`), and Twitter Card tags, each in an overridable Jinja2 block.
-- Rendered `dist/` includes the defaults and preserves child-template overrides.
-- `dist/` rebuilt via `.venv/bin/python -m src.build_frontend` and committed in the same commit as the template change.
-- No backend/API files touched; `dist/` remains in sync with sources.
+- `GET /api/health` returns **200 OK** with `status`, `service`, `version`, `uptime_seconds`, `database` fields; DB unreachable → `"down"`, never a 5xx.
+- Pytest suite (`src/tests/test_health.py`) passes; full `.venv/bin/python -m pytest` has no new failures.
+- `src/api/health.py`, `src/main.py` wiring, and tests committed together; no `dist/` changes (backend-only).

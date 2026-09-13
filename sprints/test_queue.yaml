@@ -23,4 +23,4 @@ tasks:
   plan_model: opencode/big-pickle
   build_model: opencode/big-pickle
   verify_cmd: .venv/bin/python -m pytest
-  status: pending
+  status: completed

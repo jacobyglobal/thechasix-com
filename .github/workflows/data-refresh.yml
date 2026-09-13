@@ -33,6 +33,12 @@ jobs:
         run: |
           python -m src.build_frontend
 
+      - name: Verify web architecture compliance
+        env:
+          CWA_SKIP_GIT_HOOK: '1'
+        run: |
+          python scripts/check_web_arch.py --expected-api-root https://api.thechasix.com
+
       - name: Push updated static files to Netlify
         uses: netlify/actions/cli@master
         env:

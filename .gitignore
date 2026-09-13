@@ -59,6 +59,9 @@ opencode.json.backup
 backlog.csv
 planning.csv
 
+# Sprint planning docs (not functionality; kept local only)
+sprints/
+
 # QA scratch output
 QA/
 

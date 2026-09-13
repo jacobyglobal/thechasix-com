@@ -1,0 +1,26 @@
+settings:
+  timeout_seconds: 300
+  retry_attempts: 1
+  circuit_breaker: 2
+  plan_models:
+  - opencode/big-pickle
+  build_models:
+  - opencode/big-pickle
+tasks:
+- id: TEST-01
+  epic: Frontend Verification (SEO-01)
+  title: Add default meta title, description, and Open Graph tags to src/templates/base.html
+  task_type: frontend
+  plan_model: opencode/big-pickle
+  build_model: opencode/big-pickle
+  verify_cmd: .venv/bin/python -m src.build_frontend
+  status: completed
+- id: TEST-02
+  epic: Backend Verification (PIPE-01)
+  title: Create src/api/health.py with a GET /api/health service-status endpoint and
+    a pytest test
+  task_type: backend
+  plan_model: opencode/big-pickle
+  build_model: opencode/big-pickle
+  verify_cmd: .venv/bin/python -m pytest
+  status: pending

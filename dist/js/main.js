@@ -92,7 +92,7 @@
           var tr = document.createElement("tr");
           tr.innerHTML =
             "<td>" + row.rank + "</td>" +
-            "<td><a href='/stock.html?ticker=" + row.ticker + "'>" + row.ticker + "</a></td>" +
+        "<td><a href='/chart/" + row.ticker + "'>" + row.ticker + "</a></td>" +
             "<td>" + row.sector + "</td>" +
             "<td>" + fmtNum(row.close) + "</td>" +
             durationCell(row, "4w") +
@@ -154,7 +154,7 @@
       var tr = document.createElement("tr");
       tr.innerHTML =
         "<td>" + row.rank + "</td>" +
-        "<td><a href='/stock.html?ticker=" + row.ticker + "'>" + row.ticker + "</a></td>" +
+        "<td><a href='/chart/" + row.ticker + "'>" + row.ticker + "</a></td>" +
         "<td>" + row.sector + "</td>" +
         "<td>" + fmtNum(row.close) + "</td>" +
         durationCell(row, "4w", screenerMode) +
@@ -326,7 +326,7 @@
           var li = document.createElement("li");
           var t = item.ticker || item.symbol || "";
           li.innerHTML =
-            "<a href='/stock.html?ticker=" + t + "'>" + t + "</a>" +
+            "<a href='/chart/" + t + "'>" + t + "</a>" +
             "<span class='meta'> — relationship " + item.rank + "/10</span>";
           list.appendChild(li);
         });

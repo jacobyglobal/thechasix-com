@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The ChasIX — Financial Intelligence</title>
-  <meta name="description" content="Financial intelligence platform providing ETF market highs, sector breadth metrics, and stock market analytics." />
+  <title>Decile Rankings — The ChasIX</title>
+  <meta name="description" content="52-week range & decile distance matrix view across tracked securities." />
   <meta property="og:site_name" content="The ChasIX" />
-  <meta property="og:title" content="The ChasIX — Financial Intelligence" />
-  <meta property="og:description" content="Financial intelligence platform providing ETF market highs, sector breadth metrics, and stock market analytics." />
+  <meta property="og:title" content="Decile Rankings — The ChasIX" />
+  <meta property="og:description" content="52-week range & decile distance matrix view across tracked securities." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://thechasix.com" />
   <meta property="og:image" content="https://thechasix.com/og-image.png" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="The ChasIX — Financial Intelligence" />
-  <meta name="twitter:description" content="Financial intelligence platform providing ETF market highs, sector breadth metrics, and stock market analytics." />
+  <meta name="twitter:title" content="Decile Rankings — The ChasIX" />
+  <meta name="twitter:description" content="52-week range & decile distance matrix view across tracked securities." />
   <meta name="twitter:image" content="https://thechasix.com/og-image.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -44,45 +44,48 @@
 
   <main class="container">
     
-<section class="hero">
-  <h1>Market high/low intelligence across the ETF landscape</h1>
-  <p class="hero-sub">
-    Ten years of daily ETF history distilled into 4-week, 12-week, 26-week and
-    52-week market high/low deciles, sector breadth, and similar-asset comparisons.
-  </p>
-  <div class="hero-actions">
-    <a class="btn btn-primary" href="/screener">Open Screener</a>
-    <a class="btn btn-outline" href="/chart/SPY">Explore an ETF</a>
+<section class="page-head">
+  <h1>Decile Rankings</h1>
+  <p class="muted">52-week high/low relative positioning and decile bounds across the curated universe.</p>
+</section>
+
+<div class="screener-controls">
+  <div class="segmented" id="type-toggle" role="group" aria-label="Filter by asset type">
+    <button type="button" class="seg-btn active" data-type="all" aria-pressed="true">All</button>
+    <button type="button" class="seg-btn" data-type="ETF" aria-pressed="false">ETF</button>
+    <button type="button" class="seg-btn" data-type="Stock" aria-pressed="false">Stock</button>
   </div>
-</section>
+  <input type="text" id="filter-ticker" placeholder="Filter ticker…" />
+  <button class="btn btn-outline" id="btn-reset">Reset</button>
+</div>
+<p class="muted" id="watchlist-date"></p>
 
-<section class="breadth-card" data-breadth>
-  <h2>Market Breadth</h2>
-  <p class="muted">Loading breadth aggregates…</p>
-  <div class="breadth-grid"></div>
-</section>
-
-<section class="leaderboard-card">
-  <h2>Top ETF Market Profiles</h2>
-  <p class="muted">Loading leaderboard…</p>
-  <table class="table" data-leaderboard>
+<div class="table-wrap">
+  <table class="table" id="watchlist-table">
     <thead>
-      <tr>
-        <th>Rank</th>
-        <th>Ticker</th>
-        <th>Sector</th>
-        <th>Close</th>
-        <th>4w</th>
-        <th>12w</th>
-        <th>26w</th>
-        <th>52w</th>
-        <th>Score</th>
-      </tr>
+      <tr></tr>
     </thead>
     <tbody></tbody>
   </table>
-  <p class="muted" style="font-size:0.8rem;margin-top:10px;">Duration cells show % off period high (ln) over the period high price; color = distance from high (black = near, red = far).</p>
-</section>
+</div>
+<p class="muted" id="watchlist-scroll-hint" hidden></p>
+
+<div class="watchlist-pagination">
+  <span class="muted" id="watchlist-count"></span>
+  <span class="page-nav">
+    <button type="button" class="page-btn" id="page-prev">Prev</button>
+    <span class="page-info" id="page-info"></span>
+    <button type="button" class="page-btn" id="page-next">Next</button>
+  </span>
+  <label class="page-size" for="page-size-select">Show
+    <select id="page-size-select">
+      <option value="10" selected>10</option>
+      <option value="25">25</option>
+      <option value="50">50</option>
+      <option value="0">All</option>
+    </select>
+  </label>
+</div>
 
   </main>
 
@@ -97,5 +100,7 @@
   </script>
   <script src="/js/main.js" defer></script>
   
+<script src="/js/watchlist.js" defer></script>
+
 </body>
 </html>

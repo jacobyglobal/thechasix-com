@@ -198,7 +198,7 @@
 
       tr.innerHTML =
         "<td>" + fmtDate(a.published_at) + "</td>" +
-        "<td><a href='/stock.html?ticker=" + esc(a.ticker) + "'>" + esc(a.ticker) + "</a></td>" +
+        "<td><a href='/chart/" + esc(a.ticker) + "'>" + esc(a.ticker) + "</a></td>" +
         "<td>" + (a.catalyst ? "<span class='cat-badge' title='Ticker moved intraday (RVOL ≥ 2 or |Ch%| ≥ 2). Catalyst likely.'>&#9679;</span>" : "") + "</td>" +
         "<td class='left'>" +
           (a.url ? '<a href="' + esc(a.url) + '" target="_blank" rel="noopener">' + esc(a.title) + "</a>" : esc(a.title)) +

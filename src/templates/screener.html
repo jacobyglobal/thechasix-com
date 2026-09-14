@@ -1,12 +1,21 @@
 {% extends "base.html" %}
-{% block title %}ETF Screener — The ChasIX{% endblock %}
+{% block title %}Screener — The ChasIX{% endblock %}
 {% block content %}
 <section class="page-head">
-  <h1>ETF &amp; Sector Screener</h1>
-  <p class="muted">Market high/low deciles across 4w / 12w / 26w / 52w horizons.</p>
+  <h1>Screener</h1>
+  <p class="muted">Master tabular view with all metrics &amp; customizable columns (FinViz/FanGraphs style).</p>
 </section>
 
+<div class="scope-banner">
+  Showing Chasix Curated Universe (~100 Tracked Securities)
+</div>
+
 <div class="screener-controls">
+  <div class="segmented" id="type-toggle" role="group" aria-label="Filter by asset type">
+    <button type="button" class="seg-btn active" data-type="etf" aria-pressed="true">ETF</button>
+    <button type="button" class="seg-btn" data-type="stock" aria-pressed="false">Stock</button>
+    <button type="button" class="seg-btn" data-type="all" aria-pressed="false">All</button>
+  </div>
   <input type="text" id="filter-ticker" placeholder="Filter ticker…" />
   <select id="filter-sector">
     <option value="">All sectors</option>
@@ -48,4 +57,7 @@
 </div>
 <p class="muted" style="font-size:0.8rem;" id="screener-note">Duration cells show % off period high (ln) over the period high price; color = strength (black = nearest high, red = deepest drawdown).</p>
 <p class="muted" id="screener-count"></p>
+{% endblock %}
+{% block scripts %}
+<script src="/js/screener.js" defer></script>
 {% endblock %}

@@ -1,15 +1,36 @@
 {% extends "base.html" %}
-{% block title %}{{ ticker|default("Stock Detail") }} — The ChasIX{% endblock %}
+{% block title %}{{ ticker|default("Chart") }} — Chart Detail{% endblock %}
 {% block content %}
+<nav aria-label="Breadcrumbs">
+  <ol class="breadcrumbs">
+    <li><a href="/screener">Screener</a></li>
+    <li><a href="/views/deciles">Views</a></li>
+    <li aria-current="page">Chart: {{ ticker|default("SYMBOL") }}</li>
+  </ol>
+</nav>
+
 <section class="page-head">
   <h1><span id="detail-ticker">{{ ticker|default("SPY") }}</span> <small class="muted" id="detail-sector"></small></h1>
+  <div class="detail-badge">
+    <span class="badge-type">{{ asset_type|default("—") }}</span>
+    <span class="badge-decile">Decile {{ decile|default("—") }}</span>
+    <span class="badge-distance">52W High Distance: {{ high_distance|default("—") }}%</span>
+  </div>
 </section>
 
 <div id="detail-error" class="alert" hidden></div>
 
+<section class="card">
+  <div class="chart-head">
+    <h2>Price History with Decile Bands</h2>
+    <div class="chart-periods" id="chart-periods"></div>
+  </div>
+  <div class="chart-wrap"><canvas id="price-chart"></canvas></div>
+</section>
+
 <section class="detail-grid">
   <div class="card" data-profile>
-    <h2>Market High / Low Profile <span class="muted" id="profile-score"></span></h2>
+    <h2>Key Statistics</h2>
     <table class="table" id="profile-table">
       <thead>
         <tr>
@@ -27,14 +48,6 @@
     <h2>Similar Assets / Market Profiles</h2>
     <ul class="similar-list" id="similar-list"></ul>
   </div>
-</section>
-
-<section class="card">
-  <div class="chart-head">
-    <h2>Price History (10-Year Daily)</h2>
-    <div class="chart-periods" id="chart-periods"></div>
-  </div>
-  <div class="chart-wrap"><canvas id="price-chart"></canvas></div>
 </section>
 {% endblock %}
 {% block scripts %}

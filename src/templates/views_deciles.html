@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Decile Rankings — The ChasIX{% endblock %}
+{% block description %}52-week range & decile distance matrix view across tracked securities.{% endblock %}
+{% block content %}
+<section class="page-head">
+  <h1>Decile Rankings</h1>
+  <p class="muted">52-week high/low relative positioning and decile bounds across the curated universe.</p>
+</section>
+
+<div class="screener-controls">
+  <div class="segmented" id="type-toggle" role="group" aria-label="Filter by asset type">
+    <button type="button" class="seg-btn active" data-type="all" aria-pressed="true">All</button>
+    <button type="button" class="seg-btn" data-type="ETF" aria-pressed="false">ETF</button>
+    <button type="button" class="seg-btn" data-type="Stock" aria-pressed="false">Stock</button>
+  </div>
+  <input type="text" id="filter-ticker" placeholder="Filter ticker…" />
+  <button class="btn btn-outline" id="btn-reset">Reset</button>
+</div>
+<p class="muted" id="watchlist-date"></p>
+
+<div class="table-wrap">
+  <table class="table" id="watchlist-table">
+    <thead>
+      <tr></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+<p class="muted" id="watchlist-scroll-hint" hidden></p>
+
+<div class="watchlist-pagination">
+  <span class="muted" id="watchlist-count"></span>
+  <span class="page-nav">
+    <button type="button" class="page-btn" id="page-prev">Prev</button>
+    <span class="page-info" id="page-info"></span>
+    <button type="button" class="page-btn" id="page-next">Next</button>
+  </span>
+  <label class="page-size" for="page-size-select">Show
+    <select id="page-size-select">
+      <option value="10" selected>10</option>
+      <option value="25">25</option>
+      <option value="50">50</option>
+      <option value="0">All</option>
+    </select>
+  </label>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/js/watchlist.js" defer></script>
+{% endblock %}

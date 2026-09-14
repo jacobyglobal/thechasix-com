@@ -190,7 +190,7 @@
       columns.forEach(function (col) {
         if (col.name === "Ticker") {
           var sym = row.Ticker === null || row.Ticker === undefined ? "" : String(row.Ticker);
-          html += "<td><a href='/stock.html?ticker=" + encodeURIComponent(sym) + "'>" + sym + "</a></td>";
+          html += "<td><a href='/chart/" + encodeURIComponent(sym) + "'>" + sym + "</a></td>";
           return;
         }
         var v = row[col.name];

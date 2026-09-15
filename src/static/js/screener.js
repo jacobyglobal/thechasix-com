@@ -79,10 +79,6 @@
     var decileCol = screenerMode === "low" ? "low_decile_52w" : "high_decile_52w";
 
     var rows = screenerRows.filter(function (row) {
-      var typeMatch = screenerType === "all" || row.type === screenerType ||
-        (screenerType === "etf" && row.type === "ETF") ||
-        (screenerType === "stock" && row.type === "Stock");
-      if (!typeMatch) return false;
       if (tickerFilter && row.ticker.toLowerCase().indexOf(tickerFilter) === -1) return false;
       if (sector && row.sector !== sector) return false;
       if (decile && row[decileCol] !== Number(decile)) return false;
@@ -204,9 +200,10 @@
 
     document.querySelectorAll("#type-toggle .seg-btn").forEach(function (btn) {
       btn.addEventListener("click", function () {
-        screenerType = btn.getAttribute("data-type");
-        updateTypeToggleUI();
-        renderScreener();
+        var type = btn.getAttribute("data-type");
+        var url = "/screener";
+        if (type !== "all") { url += "?type=" + type; }
+        window.location.href = url;
       });
     });
 

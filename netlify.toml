@@ -3,6 +3,42 @@
   command = "echo 'Pre-built locally, skipping Netlify build step.'"
 
 [[redirects]]
+  from = "/screener"
+  to = "/screener.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/views"
+  to = "/views.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/views/deciles"
+  to = "/views.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/edge"
+  to = "/calculator.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/chart/*"
+  to = "/chart.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/news"
+  to = "/news.html"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/api/*"
   to = "https://api.thechasix.com/api/:splat"
   status = 200

@@ -1,0 +1,6 @@
+/screener  /screener.html   200
+/views     /views.html      200
+/views/deciles  /views.html  200
+/edge      /calculator.html 200
+/chart/*   /chart.html      200
+/news      /news.html       200

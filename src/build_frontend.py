@@ -58,6 +58,17 @@ def build() -> None:
             (DIST_DIR / asset_dir / file.name).write_text(file.read_text(encoding="utf-8"), encoding="utf-8")
             print(f"Copied {file.name} -> dist/{asset_dir}/")
 
+    _redirects = """\
+/screener  /screener.html   200
+/views     /views.html      200
+/views/deciles  /views.html  200
+/edge      /calculator.html 200
+/chart/*   /chart.html      200
+/news      /news.html       200
+"""
+    (DIST_DIR / "_redirects").write_text(_redirects, encoding="utf-8")
+    print(f"Copied _redirects -> dist/_redirects")
+
     print(f"Build complete: {DIST_DIR}")
 
 

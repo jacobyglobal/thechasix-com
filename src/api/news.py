@@ -82,7 +82,7 @@ async def get_news(
         NewsArticleRow.published_at.desc().nullslast(),
     )
     # Only publish rows that cleared the noise/dedup filter.
-    query = query.where(NewsArticleRow.is_filtered == 0)
+    query = query.where(NewsArticleRow.is_filtered == False)
     if ticker:
         query = query.where(NewsArticleRow.ticker == ticker.upper())
     if sentiment:
